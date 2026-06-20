@@ -213,6 +213,22 @@ html[data-theme="dark"] .headline{box-shadow:0 10px 40px rgba(0,0,0,.6);}
 .summary b{font-weight:600;}
 .summary .big{color:var(--up);font-family:var(--font-mono);font-weight:500;}
 
+/* before/after conclusion comparison */
+.compare{margin-top:16px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.cmp-row{display:grid;grid-template-columns:1.25fr 1fr 1fr;}
+.cmp-row > div{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13.5px;}
+.cmp-row:last-child > div{border-bottom:0;}
+.cmp-row > div + div{border-left:1px solid var(--border);}
+.cmp-head > div{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--fg-faint);font-weight:600;background:var(--bg-subtle);}
+.cmp-head .cmp-after{color:var(--up);}
+.cmp-lab{color:var(--fg-muted);}
+.cmp-before,.cmp-after{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;}
+.cmp-after{color:var(--up);}
+.cmp-after.flat{color:var(--fg-muted);}
+.cmp-after small{display:block;font-size:10.5px;opacity:.85;font-weight:400;}
+.cmp-row.cmp-raise > div{background:var(--up-bg);font-weight:600;border-top:1px solid var(--border-strong);}
+.cmp-row.cmp-raise .cmp-before{color:var(--fg-faint);font-weight:400;}
+
 /* before/after bars */
 .bars{margin-top:16px;}
 .bar-line{margin-bottom:13px;}
@@ -279,10 +295,14 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-
   .hl-body{overflow:hidden;transition:max-height .22s ease,opacity .18s ease;}
   .headline.collapsed .hl-body{max-height:0;opacity:0;}
   .headline.collapsed .hl-peek-num{color:var(--up);}
+  .cmp-row > div{padding:8px 9px;font-size:12.5px;}
+  .cmp-row{grid-template-columns:1.15fr 1fr 1fr;}
+  .cmp-after small{font-size:10px;}
 }
 @media (max-width:380px){
   .wrap{padding:0 12px 120px;}
   .brand small{display:none;}
+  .cmp-row > div{padding:7px 7px;font-size:11.5px;}
 }
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
 </style>
@@ -422,6 +442,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-
       </div>
     </div>
     <div class="summary" id="summary"></div>
+    <div class="compare" id="compare"></div>
     <div class="bars" id="bars"></div>
     </div><!-- /hl-body -->
   </div>
@@ -537,6 +558,9 @@ const I18N = {
     barNow:'Coș lunar — acum', barAfter:'Coș lunar — 2027',
     legBase:'Cost actual', legDirect:'TVA direct', legCascade:'Cascadă (est.)',
     splitTpl:'{direct} direct + {cascade} cascadă',
+    cmpMetric:'Indicator', cmpBefore:'Fără reformă', cmpAfter:'Cu reforma 2027',
+    cmpMonthly:'Coș lunar', cmpAnnual:'Coș anual', cmpGross:'Salariu brut necesar',
+    cmpNet:'Salariu net (în mână)', cmpRaise:'Majorare necesară',
   },
   en:{
     brand:'Impact 2027', brandSub:'· MD',
@@ -576,6 +600,9 @@ const I18N = {
     barNow:'Monthly basket — now', barAfter:'Monthly basket — 2027',
     legBase:'Current cost', legDirect:'Direct VAT', legCascade:'Cascade (est.)',
     splitTpl:'{direct} direct + {cascade} cascade',
+    cmpMetric:'Metric', cmpBefore:'No reform', cmpAfter:'With 2027 reform',
+    cmpMonthly:'Monthly basket', cmpAnnual:'Annual basket', cmpGross:'Gross salary needed',
+    cmpNet:'Net salary (take-home)', cmpRaise:'Raise needed',
   },
   ru:{
     brand:'Impact 2027', brandSub:'· MD',
@@ -615,6 +642,9 @@ const I18N = {
     barNow:'Корзина за месяц — сейчас', barAfter:'Корзина за месяц — 2027',
     legBase:'Текущая стоимость', legDirect:'Прямой НДС', legCascade:'Каскад (оц.)',
     splitTpl:'{direct} прямой + {cascade} каскад',
+    cmpMetric:'Показатель', cmpBefore:'Без реформы', cmpAfter:'С реформой 2027',
+    cmpMonthly:'Корзина за месяц', cmpAnnual:'Корзина за год', cmpGross:'Нужная зарплата брутто',
+    cmpNet:'Зарплата нетто (на руки)', cmpRaise:'Нужная прибавка',
   },
 };
 
@@ -814,6 +844,26 @@ function renderHeadline(){
     .replace('{pct}', '+'+fmt(c.raisePct*100,1)+'%')
     .replace('{direct}', fmtMDL(c.basket.directDeltaSum))
     .replace('{cascade}', fmtMDL(c.basket.cascadeSum));
+
+  // before/after CONCLUSION comparison: no reform vs 2027 reform
+  const bk=c.basket;
+  const before = { monthly:bk.oldSum, annual:bk.oldSum*12, gross:c.cur.gross, net:c.cur.net };
+  const after  = { monthly:bk.newSum, annual:bk.newSum*12, gross:c.cur.gross+c.raise, net:c.cur.net+c.extra };
+  const cmpRow=(lab,bv,av,extraCls='')=>{
+    const d=av-bv; const flat=Math.abs(d)<0.5;
+    const after = flat ? fmtMDL(av) : fmtMDL(av)+`<small>+${fmtMDL(d)}</small>`;
+    return `<div class="cmp-row ${extraCls}">
+      <div class="cmp-lab">${lab}</div>
+      <div class="cmp-before">${fmtMDL(bv)}</div>
+      <div class="cmp-after ${flat?'flat':''}">${after}</div>
+    </div>`;
+  };
+  document.getElementById('compare').innerHTML =
+    `<div class="cmp-row cmp-head"><div>${t.cmpMetric}</div><div class="cmp-before" style="text-align:right">${t.cmpBefore}</div><div class="cmp-after" style="text-align:right">${t.cmpAfter}</div></div>`
+    + cmpRow(t.cmpMonthly, before.monthly, after.monthly)
+    + cmpRow(t.cmpAnnual,  before.annual,  after.annual)
+    + cmpRow(t.cmpNet,     before.net,     after.net)
+    + cmpRow(t.cmpGross,   before.gross,   after.gross, 'cmp-raise');
 
   // before/after bars
   const b=c.basket;
