@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Calculator fiscal interactiv: cum afectează reforma fiscală 2027 din Republica Moldova salariul net și costul vieții (TVA, gaze, energie, alimente, medicamente) — și ce ajustare salarială ar fi necesară." />
+<title>Calculator Fiscal 2027 · Republica Moldova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* Vercel-style dark palette (default) */
+    --bg: #000000;
+    --bg-subtle: #0a0a0a;
+    --card: #0a0a0a;
+    --card-hover: #111111;
+    --border: #242424;
+    --border-strong: #383838;
+    --text: #ededed;
+    --text-secondary: #a1a1a1;
+    --text-muted: #6b6b6b;
+    --accent: #ffffff;
+    --accent-fg: #000000;
+    --blue: #0070f3;
+    --green: #18b888;
+    --green-soft: rgba(24,184,136,.12);
+    --red: #f5466b;
+    --red-soft: rgba(245,70,107,.12);
+    --amber: #f5a623;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25);
+  }
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --bg-subtle: #fafafa;
+    --card: #ffffff;
+    --card-hover: #fafafa;
+    --border: #eaeaea;
+    --border-strong: #d4d4d4;
+    --text: #000000;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+    --accent: #000000;
+    --accent-fg: #ffffff;
+    --blue: #0070f3;
+    --green: #0a8f68;
+    --green-soft: rgba(10,143,104,.10);
+    --red: #e0234e;
+    --red-soft: rgba(224,35,78,.08);
+    --amber: #b8770a;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    font-size: 15px;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    transition: background .2s ease, color .2s ease;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px 96px; }
+
+  /* ---------- Header ---------- */
+  header.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .top-inner {
+    max-width: 920px; margin: 0 auto; padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .logo { width: 22px; height: 22px; flex-shrink: 0; }
+  .logo path { fill: var(--text); }
+  .brand b { font-weight: 600; font-size: 15px; letter-spacing: -.02em; white-space: nowrap; }
+  .brand span { color: var(--text-muted); font-size: 13px; }
+  .theme-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    width: 36px; height: 36px; border-radius: var(--radius-sm); cursor: pointer;
+    display: grid; place-items: center; transition: border-color .15s, background .15s;
+  }
+  .theme-btn:hover { border-color: var(--border-strong); background: var(--card-hover); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 56px 0 36px; }
+  .hero h1 {
+    font-size: clamp(30px, 6vw, 46px); font-weight: 700; letter-spacing: -.04em; line-height: 1.05;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(90deg, var(--text), var(--text-muted));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p { margin-top: 16px; color: var(--text-secondary); font-size: 17px; max-width: 620px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .badge {
+    font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px;
+    background: var(--bg-subtle); display: inline-flex; gap: 6px; align-items: center;
+  }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .badge.warn .dot { background: var(--amber); }
+
+  /* ---------- Cards / sections ---------- */
+  section.card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px; margin-top: 22px; box-shadow: var(--shadow);
+  }
+  .sec-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+  .sec-num {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-strong);
+    display: grid; place-items: center; font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary);
+  }
+  .sec-head h2 { font-size: 19px; font-weight: 600; letter-spacing: -.02em; }
+  .sec-head p { color: var(--text-secondary); font-size: 14px; margin-top: 3px; }
+
+  /* ---------- Inputs ---------- */
+  label.field { display: block; margin-bottom: 16px; }
+  label.field .lab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 7px; }
+  label.field .lab span:first-child { font-size: 13px; font-weight: 500; }
+  label.field .hint { font-size: 12px; color: var(--text-muted); }
+  .inp-shell { position: relative; display: flex; align-items: center; }
+  .inp-shell .suffix {
+    position: absolute; right: 12px; font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); pointer-events: none;
+  }
+  input[type="number"], input[type="text"], select {
+    width: 100%; background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text);
+    border-radius: var(--radius-sm); padding: 11px 12px; font-size: 15px; font-family: var(--font-sans);
+    transition: border-color .15s, box-shadow .15s; outline: none; -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 22%, transparent); }
+  .inp-shell input { padding-right: 46px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+  /* segmented toggle */
+  .seg { display: inline-flex; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; gap: 3px; }
+  .seg button {
+    border: 0; background: transparent; color: var(--text-secondary); font-family: var(--font-sans);
+    font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all .15s;
+  }
+  .seg button.on { background: var(--accent); color: var(--accent-fg); }
+
+  .switch-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .switch { position: relative; width: 40px; height: 23px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider-sw { position: absolute; inset: 0; background: var(--border-strong); border-radius: 999px; transition: .2s; cursor: pointer; }
+  .slider-sw:before { content:""; position:absolute; height:17px; width:17px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .slider-sw { background: var(--blue); }
+  .switch input:checked + .slider-sw:before { transform: translateX(17px); }
+
+  /* ---------- Salary results ---------- */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+  .col {
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; background: var(--bg-subtle);
+  }
+  .col.now { }
+  .col.next { border-color: color-mix(in srgb, var(--blue) 40%, var(--border)); }
+  .col h3 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 4px; }
+  .col .net-big { font-size: 30px; font-weight: 700; letter-spacing: -.03em; font-family: var(--font-mono); }
+  .col .net-big small { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+  .breakdown { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .breakdown .row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; }
+  .breakdown .row span:first-child { color: var(--text-secondary); }
+  .breakdown .row span:last-child { font-family: var(--font-mono); }
+  .breakdown .row.minus span:last-child { color: var(--red); }
+  .breakdown .row.plus span:last-child { color: var(--green); }
+
+  /* ---------- Basket table ---------- */
+  .basket { width: 100%; border-collapse: collapse; }
+  .basket thead th {
+    text-align: right; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted);
+    font-weight: 500; padding: 0 8px 10px; border-bottom: 1px solid var(--border);
+  }
+  .basket thead th:first-child { text-align: left; }
+  .basket tbody td { padding: 9px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .basket .cat { display: flex; align-items: center; gap: 9px; }
+  .basket .cat .ic { width: 20px; text-align: center; opacity: .85; }
+  .basket .cat .nm { font-size: 13.5px; font-weight: 500; }
+  .basket .cat .ph { font-size: 11px; color: var(--text-muted); display: block; }
+  .basket input.amt { width: 92px; text-align: right; padding: 7px 9px; font-size: 13px; font-family: var(--font-mono); }
+  .basket input.vat { width: 52px; text-align: right; padding: 7px 7px; font-size: 13px; font-family: var(--font-mono); }
+  .basket .delta { font-family: var(--font-mono); font-size: 13px; text-align: right; white-space: nowrap; }
+  .basket .delta.up { color: var(--red); }
+  .basket .delta.flat { color: var(--text-muted); }
+  .basket td.num { text-align: right; }
+  .basket tfoot td { padding: 12px 8px 0; font-weight: 600; font-size: 14px; }
+  .basket tfoot td.num { font-family: var(--font-mono); }
+  .vat-arrow { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; display:inline-flex; align-items:center; gap:4px; }
+  .energy-tag { font-size: 9.5px; font-family: var(--font-mono); color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent); border-radius: 4px; padding: 1px 4px; margin-left: 2px; }
+
+  .mini-note { font-size: 12px; color: var(--text-muted); margin-top: 14px; line-height: 1.6; }
+
+  /* ---------- Cascade ---------- */
+  .range-wrap { margin-top: 4px; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 999px; background: var(--border-strong); outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); cursor: pointer; box-shadow: 0 0 0 1px var(--border-strong); }
+  input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); cursor: pointer; }
+  .range-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+  .cascade-readout { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+  .stat { flex: 1; min-width: 130px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; background: var(--bg-subtle); }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  .stat .v { font-size: 22px; font-weight: 700; font-family: var(--font-mono); letter-spacing: -.02em; margin-top: 4px; }
+
+  /* ---------- Conclusion ---------- */
+  .verdict { border-width: 1px; border-style: solid; border-radius: var(--radius); padding: 28px; margin-top: 22px; }
+  .verdict.good { border-color: color-mix(in srgb, var(--green) 45%, var(--border)); background: var(--green-soft); }
+  .verdict.bad { border-color: color-mix(in srgb, var(--red) 45%, var(--border)); background: var(--red-soft); }
+  .verdict .vtitle { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); }
+  .verdict .vbig { font-size: clamp(34px, 8vw, 52px); font-weight: 800; letter-spacing: -.04em; margin: 6px 0 2px; font-family: var(--font-mono); }
+  .verdict .vbig.good { color: var(--green); }
+  .verdict .vbig.bad { color: var(--red); }
+  .verdict .vsub { color: var(--text-secondary); font-size: 15px; }
+  .ledger { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-top: 22px; }
+  .ledger .lrow { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--card); gap: 12px; }
+  .ledger .lrow .ll { font-size: 14px; }
+  .ledger .lrow .ll small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 1px; }
+  .ledger .lrow .lv { font-family: var(--font-mono); font-size: 16px; font-weight: 600; white-space: nowrap; }
+  .ledger .lrow.total { background: var(--bg-subtle); }
+  .pos { color: var(--green); } .neg { color: var(--red); }
+
+  .adjust-card { margin-top: 22px; border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 22px; }
+  .adjust-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .adjust-card .big-raise { font-size: 28px; font-weight: 700; font-family: var(--font-mono); letter-spacing: -.02em; margin: 8px 0; }
+  .adjust-card p { font-size: 13.5px; color: var(--text-secondary); }
+
+  /* ---------- Methodology ---------- */
+  details.method { margin-top: 22px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+  details.method > summary {
+    cursor: pointer; padding: 18px 22px; font-weight: 600; font-size: 15px; list-style: none;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  details.method > summary::-webkit-details-marker { display: none; }
+  details.method > summary .chev { transition: transform .2s; color: var(--text-muted); }
+  details.method[open] > summary .chev { transform: rotate(180deg); }
+  .method-body { padding: 0 22px 22px; color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+  .method-body h4 { color: var(--text); font-size: 14px; margin: 18px 0 6px; }
+  .method-body code { font-family: var(--font-mono); font-size: 12.5px; background: var(--bg-subtle); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+  .method-body ul { margin: 6px 0 6px 20px; }
+  .method-body li { margin: 4px 0; }
+  .method-body a { color: var(--blue); text-decoration: none; }
+  .method-body a:hover { text-decoration: underline; }
+  .disclaimer { margin-top: 14px; font-size: 12.5px; color: var(--text-muted); border-left: 2px solid var(--amber); padding-left: 12px; line-height: 1.65; }
+
+  /* timeline */
+  .timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+  .tl { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; background: var(--bg-subtle); }
+  .tl .tl-date { font-family: var(--font-mono); font-size: 12px; color: var(--blue); font-weight: 500; }
+  .tl .tl-txt { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+
+  footer.foot { text-align: center; color: var(--text-muted); font-size: 12.5px; margin-top: 40px; line-height: 1.8; }
+  footer.foot a { color: var(--text-secondary); text-decoration: none; }
+
+  .addrow {
+    margin-top: 14px; background: transparent; border: 1px dashed var(--border-strong); color: var(--text-secondary);
+    border-radius: var(--radius-sm); padding: 10px; width: 100%; cursor: pointer; font-family: var(--font-sans); font-size: 13px;
+    transition: border-color .15s, color .15s;
+  }
+  .addrow:hover { border-color: var(--blue); color: var(--text); }
+  .rm-btn { background: transparent; border: 0; color: var(--text-muted); cursor: pointer; font-size: 16px; line-height: 1; padding: 4px; }
+  .rm-btn:hover { color: var(--red); }
+
+  @media (max-width: 680px) {
+    .wrap { padding: 0 14px 72px; }
+    section.card { padding: 18px; }
+    .grid2, .compare, .timeline { grid-template-columns: 1fr; }
+    .hero { padding: 36px 0 24px; }
+    .col .net-big { font-size: 26px; }
+    /* basket -> stacked cards on mobile */
+    .basket thead { display: none; }
+    .basket, .basket tbody, .basket tr, .basket td { display: block; width: 100%; }
+    .basket tbody tr { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; padding: 6px 10px; background: var(--bg-subtle); }
+    .basket tbody td { border: 0; padding: 6px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .basket tbody td::before { content: attr(data-label); font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .basket .cat { width: 100%; }
+    .basket input.amt { width: 110px; }
+    .basket tfoot, .basket tfoot tr, .basket tfoot td { display: block; width: 100%; }
+    .basket tfoot td { display: flex; justify-content: space-between; }
+    .ledger .lrow { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 76 65" aria-hidden="true"><path d="M37.59.25l36.95 64H.64l36.95-64z"/></svg>
+      <b>Calculator Fiscal 2027</b>
+      <span>· Republica Moldova</span>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Schimbă tema" title="Schimbă tema">
+      <svg id="themeIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1><span class="grad">Cât te va costa<br>reforma fiscală 2027?</span></h1>
+    <p>Reforma propusă reduce impozitul pe venit (12% → 7%), dar majorează TVA de la 8% la 20% pe gaze, energie, alimente, restaurante și medicamente. Acest calculator pune cele două efecte față în față și îți arată impactul net real asupra bugetului tău.</p>
+    <div class="badges">
+      <span class="badge"><span class="dot"></span>Impozit pe venit 12% → 7%</span>
+      <span class="badge warn"><span class="dot"></span>TVA redus 8% → 20%</span>
+      <span class="badge"><span class="dot"></span>Efect în lanț (cascadă)</span>
+    </div>
+  </div>
+
+  <!-- ================= 1. SALARIU ================= -->
+  <section class="card">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <div>
+        <h2>Salariul tău</h2>
+        <p>Introdu salariul actual. Replicăm formula oficială a Ministerului Finanțelor și o comparăm cu noul impozit din 2027.</p>
+      </div>
+    </div>
+
+    <div class="switch-row">
+      <span style="font-size:13px;color:var(--text-secondary)">Introduc salariul ca:</span>
+      <div class="seg" id="modeSeg">
+        <button data-mode="gross" class="on">Brut</button>
+        <button data-mode="net">Net (în mână)</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <label class="field">
+        <div class="lab"><span id="salLabel">Salariu brut lunar</span><span class="hint">lei / lună</span></div>
+        <div class="inp-shell">
+          <input type="number" id="salaryInput" value="16000" min="0" step="100" inputmode="numeric" />
+          <span class="suffix">lei</span>
+        </div>
+      </label>
+      <label class="field">
+        <div class="lab"><span>Copii minori întreținuți</span><span class="hint">pentru scutiri / plata 2027</span></div>
+        <div class="inp-shell">
+          <input type="number" id="children" value="0" min="0" max="12" step="1" inputmode="numeric" />
+          <span class="suffix">copii</span>
+        </div>
+      </label>
+    </div>
+
+    <div class="grid2">
+      <div class="switch-row" style="margin:0">
+        <label class="switch"><input type="checkbox" id="usePersonal" checked /><span class="slider-sw"></span></label>
+        <span style="font-size:13px;color:var(--text-secondary)">Aplic scutirea personală (2.475 lei/lună)</span>
+      </div>
+      <div class="switch-row" style="margin:0">
+        <label class="switch"><input type="checkbox" id="useSpouse" /><span class="slider-sw"></span></label>
+        <span style="font-size:13px;color:var(--text-secondary)">Scutire pentru soț/soție (1.815 lei/lună)</span>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="col now">
+        <h3>Acum (2026)</h3>
+        <div class="net-big"><span id="net2026">0</span> <small>lei net</small></div>
+        <div class="breakdown" id="bd2026"></div>
+      </div>
+      <div class="col next">
+        <h3>După reformă (2027)</h3>
+        <div class="net-big"><span id="net2027">0</span> <small>lei net</small></div>
+        <div class="breakdown" id="bd2027"></div>
+      </div>
+    </div>
+    <div class="mini-note" id="salaryNote"></div>
+  </section>
+
+  <!-- ================= 2. COSUL DE CHELTUIELI ================= -->
+  <section class="card">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <div>
+        <h2>Coșul tău lunar de cheltuieli</h2>
+        <p>Cât cheltuiești lunar pe fiecare categorie? Coloana TVA arată cota actuală → cota din 2027. Calculăm scumpirea directă presupunând că prețul fără TVA rămâne neschimbat.</p>
+      </div>
+    </div>
+
+    <table class="basket">
+      <thead>
+        <tr>
+          <th>Categorie</th>
+          <th>Cheltuială/lună</th>
+          <th>TVA acum → 2027</th>
+          <th>Scumpire</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="basketBody"></tbody>
+      <tfoot>
+        <tr>
+          <td data-label="Total" class="cat" style="font-weight:600">Total cheltuieli lunare</td>
+          <td data-label="Acum" class="num" id="basketTotalOld">0</td>
+          <td></td>
+          <td data-label="Scumpire directă" class="delta up" id="basketDirect">+0</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+    <button class="addrow" id="addRow">+ Adaugă o categorie de cheltuială</button>
+    <div class="mini-note">
+      <strong>Eticheta <span style="color:var(--amber)">⚡energie</span></strong> marchează categoriile care alimentează efectul în lanț din secțiunea următoare.
+      Combustibilul, chiria existentă, hainele și comunicațiile sunt deja la 20% TVA — ele nu se scumpesc direct, dar resimt scumpirea indirectă (cascada).
+    </div>
+  </section>
+
+  <!-- ================= 3. EFECTUL IN LANT ================= -->
+  <section class="card">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <div>
+        <h2>Efectul în lanț (scumpirea indirectă)</h2>
+        <p>Scumpirea energiei nu se oprește la factura ta. Gazul și curentul intră în costul de producție și transport al <em>tuturor</em> bunurilor. Reglează cât de puternic se transmite acest șoc în restul prețurilor.</p>
+      </div>
+    </div>
+
+    <div class="lab" style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:500">Intensitatea transmiterii în lanț</span>
+      <span class="hint" id="cascadeIntensityLabel" style="font-family:var(--font-mono)">40%</span>
+    </div>
+    <div class="range-wrap">
+      <input type="range" id="cascadeRange" min="0" max="100" value="40" />
+      <div class="range-labels">
+        <span>0% — fără efect</span>
+        <span>Moderat</span>
+        <span>100% — transmitere totală</span>
+      </div>
+    </div>
+
+    <div class="cascade-readout">
+      <div class="stat">
+        <div class="k">Șoc energetic mediu</div>
+        <div class="v" id="energyShock">0%</div>
+      </div>
+      <div class="stat">
+        <div class="k">Inflație în lanț estimată</div>
+        <div class="v" id="cascadeRate">0%</div>
+      </div>
+      <div class="stat">
+        <div class="k">Cost indirect / lună</div>
+        <div class="v neg" id="cascadeCost">0 lei</div>
+      </div>
+    </div>
+    <div class="mini-note">
+      Inflația în lanț = șocul energetic × intensitatea aleasă, aplicată cheltuielilor non-energetice (cu excepția chiriei existente). Implicit folosim 40% — energia reprezintă aproximativ 10–12% din costurile de producție, deci doar o parte din scumpire se propagă. Mărește spre 100% pentru un scenariu pesimist.
+    </div>
+  </section>
+
+  <!-- ================= 4. CONCLUZIA ================= -->
+  <section class="card">
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <div>
+        <h2>Concluzia: ești în câștig sau în pierdere?</h2>
+        <p>Punem față în față ce câștigi din reducerea impozitului și ce pierzi din scumpiri.</p>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdictBox">
+      <div class="vtitle" id="verdictTitle">Impact net lunar</div>
+      <div class="vbig" id="verdictBig">0 lei</div>
+      <div class="vsub" id="verdictSub"></div>
+    </div>
+
+    <div class="ledger">
+      <div class="lrow">
+        <div class="ll">Câștig din reducerea impozitului <small>impozit pe venit 12% → 7% (+ plata pentru copii)</small></div>
+        <div class="lv pos" id="ledgerSalary">+0 lei</div>
+      </div>
+      <div class="lrow">
+        <div class="ll">Scumpire directă din TVA <small>gaze, energie, alimente, restaurante, medicamente</small></div>
+        <div class="lv neg" id="ledgerDirect">−0 lei</div>
+      </div>
+      <div class="lrow">
+        <div class="ll">Scumpire indirectă în lanț <small>propagarea șocului energetic în restul prețurilor</small></div>
+        <div class="lv neg" id="ledgerCascade">−0 lei</div>
+      </div>
+      <div class="lrow total">
+        <div class="ll"><strong>Impact net lunar</strong><small>anual: <span id="annualImpact">0</span> lei</small></div>
+        <div class="lv" id="ledgerTotal">0 lei</div>
+      </div>
+    </div>
+
+    <div class="adjust-card" id="adjustCard">
+      <h3>Ajustarea salarială necesară</h3>
+      <div class="big-raise" id="raiseValue">—</div>
+      <p id="raiseText"></p>
+    </div>
+  </section>
+
+  <!-- timeline -->
+  <section class="card">
+    <div class="sec-head">
+      <div class="sec-num">5</div>
+      <div>
+        <h2>Calendarul majorărilor de TVA</h2>
+        <p>Reforma se aplică etapizat — scumpirile nu vin toate odată.</p>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl"><div class="tl-date">Oct 2026</div><div class="tl-txt">Produse alimentare, alimentație publică (HoReCa), comerț electronic — TVA 8% → 20%.</div></div>
+      <div class="tl"><div class="tl-date">Ian 2027</div><div class="tl-txt">Medicamente, vehicule și cazare (hoteluri) — TVA majorat la 20%.</div></div>
+      <div class="tl"><div class="tl-date">Apr 2027</div><div class="tl-txt">Resurse energetice — gaze naturale și energie electrică, TVA 8% → 20%.</div></div>
+    </div>
+  </section>
+
+  <!-- methodology -->
+  <details class="method">
+    <summary>Cum calculăm? Formule, ipoteze și surse <span class="chev">▾</span></summary>
+    <div class="method-body">
+      <h4>Salariul (formula oficială MF)</h4>
+      Din salariul brut se rețin contribuțiile angajatului și impozitul pe venit:
+      <ul>
+        <li>Contribuția de asigurări sociale (CAS): <code>6%</code> din brut</li>
+        <li>Asigurarea medicală (CNAM): <code>9%</code> din brut</li>
+        <li>Venit impozabil = <code>brut − CAS − CNAM − scutiri</code></li>
+        <li>Impozit pe venit: <code>12%</code> în 2026, <code>7%</code> în 2027 (<code>15%</code> peste 1.000.000 lei/an)</li>
+        <li>Net = <code>brut − CAS − CNAM − impozit (+ plata pentru copii în 2027)</code></li>
+      </ul>
+      Scutirea personală în 2026 este <code>2.475 lei/lună</code> (valabilă dacă venitul nu depășește 30.000 lei/lună), scutirea pentru soț/soție <code>1.815 lei/lună</code>, iar pentru fiecare persoană întreținută <code>825 lei/lună</code>.
+      În 2027, conform proiectului, scutirea personală se transformă într-o plată directă de până la <code>500 lei/lună</code> pentru persoanele angajate legal care au copii minori (ipoteza implicită: 500 lei/lună dacă ai cel puțin un copil).
+
+      <h4>Scumpirea directă din TVA</h4>
+      Presupunem că prețul fără TVA rămâne constant și se schimbă doar cota. Pentru o cheltuială <code>C</code> la cota veche <code>v₀</code> care trece la cota nouă <code>v₁</code>:
+      <ul>
+        <li>preț fără TVA = <code>C / (1 + v₀)</code></li>
+        <li>cheltuială nouă = <code>C × (1 + v₁) / (1 + v₀)</code></li>
+        <li>Ex.: 8% → 20% înseamnă <code>1,20 / 1,08 = +11,1%</code>; 0% → 20% înseamnă <code>+20%</code>.</li>
+      </ul>
+
+      <h4>Efectul în lanț (cascada energetică)</h4>
+      Șocul energetic = scumpirea medie directă a categoriilor marcate „energie". Inflația în lanț = <code>șoc energetic × intensitate</code>, aplicată cheltuielilor non-energetice (mai puțin chiria existentă), deoarece energia este un input în producția și transportul majorității bunurilor. Intensitatea (implicit 40%) reflectă faptul că energia este doar o parte din costurile de producție.
+
+      <h4>Ajustarea salarială necesară</h4>
+      Dacă impactul net este negativ, calculăm cu cât ar trebui să crească salariul brut (în regimul fiscal 2027) astfel încât puterea de cumpărare să revină la nivelul de dinainte de reformă.
+
+      <div class="disclaimer">
+        <strong>Atenție:</strong> Acesta este un instrument educativ și o estimare. Proiectul politicii fiscale 2027 se afla în consultare publică și valorile finale pot diferi. Cotele de TVA implicite din coș sunt configurabile — verifică-le pentru situația ta. Calculatorul nu modelează accizele, ajustările de tarife reglementate la gaze/energie sau efectele de a doua rundă din inflație.
+      </div>
+
+      <h4>Surse</h4>
+      <ul>
+        <li><a href="https://www.mf.gov.md/ro/content/qa-privind-proiectul-politicii-fiscale-pentru-anul-2027" target="_blank" rel="noopener">Ministerul Finanțelor — Q&amp;A politica fiscală 2027</a></li>
+        <li><a href="https://gov.md/ro/comunicate-de-presa/politica-fiscala-pentru-2027-propusa-spre-consultari-publice-sistem-fiscal-mai" target="_blank" rel="noopener">Guvernul RM — Politica fiscală 2027 (comunicat)</a></li>
+        <li><a href="https://mf.gov.md/ro/content/modific%C4%83rile-efectuate-%C3%AEn-codul-fiscal-pentru-anul-2026-privind-impozitul-pe-venit-tva" target="_blank" rel="noopener">MF — Modificările Codului fiscal 2026 (impozit, TVA)</a></li>
+      </ul>
+    </div>
+  </details>
+
+  <footer class="foot">
+    Estimare educativă bazată pe proiectul politicii fiscale 2027 (în consultare publică).<br>
+    Formulele salariale replică metodologia oficială a Ministerului Finanțelor al RM.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Constante fiscale ---------------- */
+  const R = {
+    cas: 0.06,            // CAS angajat
+    cnam: 0.09,           // CNAM angajat
+    tax2026: 0.12,
+    tax2027: 0.07,
+    tax2027High: 0.15,
+    highAnnual: 1_000_000,
+    exPersonal: 2475,
+    exSpouse: 1815,
+    exDependent: 825,
+    exCap: 30000,         // plafon venit lunar pentru scutiri
+    childPay2027: 500     // plata lunară 2027 pt. angajați cu copii minori
+  };
+
+  /* ---------------- Coș implicit ---------------- */
+  // vatOld / vatNew în fracții. energy = alimentează cascada. exemptCascade = nu primește scumpire indirectă.
+  const DEFAULT_BASKET = [
+    { ic: "🔥", nm: "Gaze naturale",         ph: "încălzire, gătit",      amt: 600,  vatOld: 0.08, vatNew: 0.20, energy: true },
+    { ic: "💡", nm: "Energie electrică",     ph: "curent electric",       amt: 500,  vatOld: 0.08, vatNew: 0.20, energy: true },
+    { ic: "🛒", nm: "Produse alimentare",    ph: "coș de bază",           amt: 4000, vatOld: 0.08, vatNew: 0.20, energy: false },
+    { ic: "🍽️", nm: "Restaurante / cafenele", ph: "alimentație publică",   amt: 800,  vatOld: 0.08, vatNew: 0.20, energy: false },
+    { ic: "💊", nm: "Medicamente",           ph: "farmacie",              amt: 400,  vatOld: 0.08, vatNew: 0.20, energy: false },
+    { ic: "⛽", nm: "Combustibil",           ph: "deja la 20% TVA",       amt: 1200, vatOld: 0.20, vatNew: 0.20, energy: true },
+    { ic: "🏠", nm: "Chirie / întreținere",  ph: "locuință existentă",    amt: 3000, vatOld: 0.00, vatNew: 0.00, energy: false, exemptCascade: true },
+    { ic: "👕", nm: "Haine și alte bunuri",  ph: "deja la 20% TVA",       amt: 1000, vatOld: 0.20, vatNew: 0.20, energy: false },
+    { ic: "📱", nm: "Comunicații / internet",ph: "deja la 20% TVA",       amt: 400,  vatOld: 0.20, vatNew: 0.20, energy: false }
+  ];
+
+  let basket = DEFAULT_BASKET.map(o => Object.assign({}, o));
+  let inputMode = "gross"; // gross | net
+
+  /* ---------------- Utilitare ---------------- */
+  const $ = id => document.getElementById(id);
+  const fmt = n => Math.round(n).toLocaleString("ro-RO");
+  const fmtSigned = n => (n >= 0 ? "+" : "−") + fmt(Math.abs(n));
+  const pct = f => (f * 100).toLocaleString("ro-RO", { maximumFractionDigits: 1 }) + "%";
+
+  /* ---------------- Salariu ---------------- */
+  function exemptions(gross) {
+    let e = 0;
+    if ($("usePersonal").checked && gross <= R.exCap) e += R.exPersonal;
+    if ($("useSpouse").checked) e += R.exSpouse;
+    const kids = Math.max(0, parseInt($("children").value) || 0);
+    if (gross <= R.exCap) e += kids * R.exDependent; // întreținuți
+    return e;
+  }
+
+  // computeNet pentru un brut dat, în regimul 2026 sau 2027
+  function netFromGross(gross, year) {
+    const cas = gross * R.cas;
+    const cnam = gross * R.cnam;
+    let ex, rate, transfer = 0;
+    if (year === 2026) {
+      ex = exemptions(gross);
+      rate = R.tax2026;
+    } else {
+      ex = 0; // scutirea personală e înlocuită de plata directă
+      rate = gross * 12 > R.highAnnual ? R.tax2027High : R.tax2027;
+      const kids = Math.max(0, parseInt($("children").value) || 0);
+      if (kids > 0) transfer = R.childPay2027;
+    }
+    const taxable = Math.max(0, gross - cas - cnam - ex);
+    const tax = taxable * rate;
+    const net = gross - cas - cnam - tax + transfer;
+    return { gross, cas, cnam, ex, taxable, tax, transfer, rate, net };
+  }
+
+  // inversare numerică: brut din net (regim 2026)
+  function grossFromNet(targetNet, year) {
+    let lo = 0, hi = Math.max(1000, targetNet * 2.2);
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2;
+      if (netFromGross(mid, year).net < targetNet) lo = mid; else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  function renderBreakdown(el, d, year) {
+    el.innerHTML = `
+      <div class="row"><span>Salariu brut</span><span>${fmt(d.gross)}</span></div>
+      <div class="row minus"><span>CAS (6%)</span><span>−${fmt(d.cas)}</span></div>
+      <div class="row minus"><span>CNAM (9%)</span><span>−${fmt(d.cnam)}</span></div>
+      ${d.ex ? `<div class="row"><span>Scutiri</span><span>${fmt(d.ex)}</span></div>` : ""}
+      <div class="row minus"><span>Impozit (${pct(d.rate)})</span><span>−${fmt(d.tax)}</span></div>
+      ${d.transfer ? `<div class="row plus"><span>Plată copii</span><span>+${fmt(d.transfer)}</span></div>` : ""}
+    `;
+  }
+
+  /* ---------------- Coș ---------------- */
+  function renderBasket() {
+    const body = $("basketBody");
+    body.innerHTML = "";
+    basket.forEach((it, i) => {
+      const base = it.amt / (1 + it.vatOld);
+      const newAmt = base * (1 + it.vatNew);
+      const delta = newAmt - it.amt;
+      const changed = Math.abs(delta) > 0.5;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="Categorie">
+          <div class="cat">
+            <span class="ic">${it.ic}</span>
+            <span><span class="nm">${it.nm}${it.energy ? '<span class="energy-tag">⚡energie</span>' : ''}</span><span class="ph">${it.ph || ""}</span></span>
+          </div>
+        </td>
+        <td data-label="Cheltuială/lună" class="num">
+          <input class="amt" type="number" min="0" step="50" inputmode="numeric" data-i="${i}" data-f="amt" value="${it.amt}" />
+        </td>
+        <td data-label="TVA acum → 2027" class="num">
+          <span class="vat-arrow">
+            <input class="vat" type="number" min="0" max="100" step="1" data-i="${i}" data-f="vatOld" value="${Math.round(it.vatOld*100)}" />%
+            <span>→</span>
+            <input class="vat" type="number" min="0" max="100" step="1" data-i="${i}" data-f="vatNew" value="${Math.round(it.vatNew*100)}" />%
+          </span>
+        </td>
+        <td data-label="Scumpire" class="delta ${changed ? 'up' : 'flat'}">${changed ? fmtSigned(delta) : '—'}</td>
+        <td><button class="rm-btn" data-rm="${i}" title="Șterge">✕</button></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  /* ---------------- Calcul global ---------------- */
+  function calcBasket(cascadeIntensity) {
+    let totalOld = 0, direct = 0;
+    let energyOld = 0, energyNew = 0;
+    basket.forEach(it => {
+      const base = it.amt / (1 + it.vatOld);
+      const newAmt = base * (1 + it.vatNew);
+      totalOld += it.amt;
+      direct += newAmt - it.amt;
+      if (it.energy) { energyOld += it.amt; energyNew += newAmt; }
+    });
+    const energyShock = energyOld > 0 ? (energyNew - energyOld) / energyOld : 0;
+    const cascadeRate = energyShock * cascadeIntensity;
+    // cascada se aplică pe cheltuielile non-energetice (după scumpirea directă), exceptând chiria
+    let cascadeBase = 0;
+    basket.forEach(it => {
+      if (it.energy || it.exemptCascade) return;
+      const base = it.amt / (1 + it.vatOld);
+      const newAmt = base * (1 + it.vatNew);
+      cascadeBase += newAmt;
+    });
+    const cascadeCost = cascadeBase * cascadeRate;
+    return { totalOld, direct, energyShock, cascadeRate, cascadeCost };
+  }
+
+  function recalc() {
+    /* --- salariu --- */
+    const raw = Math.max(0, parseFloat($("salaryInput").value) || 0);
+    let gross;
+    if (inputMode === "gross") gross = raw;
+    else gross = grossFromNet(raw, 2026);
+
+    const d2026 = netFromGross(gross, 2026);
+    const d2027 = netFromGross(gross, 2027);
+    $("net2026").textContent = fmt(d2026.net);
+    $("net2027").textContent = fmt(d2027.net);
+    renderBreakdown($("bd2026"), d2026, 2026);
+    renderBreakdown($("bd2027"), d2027, 2027);
+    const salaryGain = d2027.net - d2026.net;
+    $("salaryNote").innerHTML = inputMode === "net"
+      ? `Salariu brut estimat: <strong>${fmt(gross)} lei</strong>. Reducerea impozitului îți aduce <strong style="color:var(--green)">${fmtSigned(salaryGain)} lei/lună</strong> în plus la net.`
+      : `Reducerea impozitului pe venit îți aduce <strong style="color:${salaryGain>=0?'var(--green)':'var(--red)'}">${fmtSigned(salaryGain)} lei/lună</strong> la salariul net.`;
+
+    /* --- coș + cascadă --- */
+    const intensity = (parseInt($("cascadeRange").value) || 0) / 100;
+    $("cascadeIntensityLabel").textContent = Math.round(intensity * 100) + "%";
+    const b = calcBasket(intensity);
+    $("basketTotalOld").textContent = fmt(b.totalOld);
+    $("basketDirect").textContent = fmtSigned(b.direct);
+    $("energyShock").textContent = pct(b.energyShock);
+    $("cascadeRate").textContent = pct(b.cascadeRate);
+    $("cascadeCost").textContent = fmt(b.cascadeCost) + " lei";
+
+    /* --- concluzie --- */
+    const costIncrease = b.direct + b.cascadeCost;
+    const netImpact = salaryGain - costIncrease;
+    const box = $("verdictBox"), big = $("verdictBig");
+    big.classList.remove("good", "bad");
+    box.classList.remove("good", "bad");
+    if (netImpact >= 0) {
+      box.classList.add("good"); big.classList.add("good");
+      big.textContent = fmtSigned(netImpact) + " lei / lună";
+      $("verdictSub").innerHTML = `Reducerea impozitului acoperă scumpirile. Rămâi în câștig cu <strong>${fmt(netImpact*12)} lei/an</strong>.`;
+    } else {
+      box.classList.add("bad"); big.classList.add("bad");
+      big.textContent = fmtSigned(netImpact) + " lei / lună";
+      $("verdictSub").innerHTML = `Scumpirile depășesc câștigul din impozit. Pierzi <strong>${fmt(Math.abs(netImpact)*12)} lei/an</strong> din puterea de cumpărare.`;
+    }
+
+    $("ledgerSalary").textContent = fmtSigned(salaryGain) + " lei";
+    $("ledgerSalary").className = "lv " + (salaryGain >= 0 ? "pos" : "neg");
+    $("ledgerDirect").textContent = "−" + fmt(b.direct) + " lei";
+    $("ledgerCascade").textContent = "−" + fmt(b.cascadeCost) + " lei";
+    const lt = $("ledgerTotal");
+    lt.textContent = fmtSigned(netImpact) + " lei";
+    lt.className = "lv " + (netImpact >= 0 ? "pos" : "neg");
+    $("annualImpact").textContent = fmtSigned(netImpact * 12);
+
+    /* --- ajustare salarială --- */
+    const card = $("adjustCard");
+    if (netImpact >= 0) {
+      $("raiseValue").textContent = "Nu este necesară";
+      $("raiseValue").style.color = "var(--green)";
+      $("raiseText").textContent = "La acest scenariu, salariul tău net acoperă scumpirile fără o majorare suplimentară.";
+    } else {
+      const neededNet = d2027.net + Math.abs(netImpact);    // net 2027 necesar pt. a reveni la puterea de cumpărare
+      const neededGross = grossFromNet(neededNet, 2027);
+      const raise = neededGross - gross;
+      const raisePct = gross > 0 ? raise / gross : 0;
+      $("raiseValue").textContent = "+" + fmt(raise) + " lei brut / lună";
+      $("raiseValue").style.color = "var(--text)";
+      $("raiseText").innerHTML = `Pentru a-ți păstra puterea de cumpărare de dinainte de reformă, salariul brut ar trebui să crească cu aproximativ <strong>${fmt(raise)} lei (${pct(raisePct)})</strong> — adică un brut de <strong>${fmt(neededGross)} lei</strong>.`;
+    }
+  }
+
+  /* ---------------- Evenimente ---------------- */
+  $("basketBody").addEventListener("input", e => {
+    const t = e.target;
+    if (t.dataset.f) {
+      const i = +t.dataset.i, f = t.dataset.f;
+      let v = parseFloat(t.value) || 0;
+      if (f === "vatOld" || f === "vatNew") v = Math.max(0, v) / 100;
+      basket[i][f] = v;
+      // re-render doar delta-urile fără a pierde focusul: recalc + update delta cell
+      const it = basket[i];
+      const base = it.amt / (1 + it.vatOld);
+      const delta = base * (1 + it.vatNew) - it.amt;
+      const cell = t.closest("tr").querySelector(".delta");
+      const changed = Math.abs(delta) > 0.5;
+      cell.className = "delta " + (changed ? "up" : "flat");
+      cell.textContent = changed ? fmtSigned(delta) : "—";
+      recalc();
+    }
+  });
+  $("basketBody").addEventListener("click", e => {
+    const rm = e.target.dataset.rm;
+    if (rm !== undefined) { basket.splice(+rm, 1); renderBasket(); recalc(); }
+  });
+  $("addRow").addEventListener("click", () => {
+    basket.push({ ic: "•", nm: "Cheltuială nouă", ph: "", amt: 500, vatOld: 0.20, vatNew: 0.20, energy: false });
+    renderBasket(); recalc();
+  });
+
+  $("modeSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    inputMode = b.dataset.mode;
+    [...$("modeSeg").children].forEach(c => c.classList.toggle("on", c === b));
+    $("salLabel").textContent = inputMode === "gross" ? "Salariu brut lunar" : "Salariu net (în mână)";
+    recalc();
+  });
+
+  ["salaryInput","children","cascadeRange","usePersonal","useSpouse"].forEach(id =>
+    $(id).addEventListener("input", recalc)
+  );
+
+  /* ---------------- Temă ---------------- */
+  $("themeBtn").addEventListener("click", () => {
+    const cur = document.body.getAttribute("data-theme");
+    document.body.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+  });
+
+  /* ---------------- Init ---------------- */
+  renderBasket();
+  recalc();
+})();
+</script>
+</body>
+</html>
