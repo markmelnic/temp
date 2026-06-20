@@ -348,7 +348,7 @@
         </div>
       </label>
       <label class="field">
-        <div class="lab"><span>Copii minori întreținuți</span><span class="hint">pentru scutiri / plata 2027</span></div>
+        <div class="lab"><span>Copii minori întreținuți</span><span class="hint">scutiri 2026 / plăți 2027</span></div>
         <div class="inp-shell">
           <input type="number" id="children" value="0" min="0" max="12" step="1" inputmode="numeric" />
           <span class="suffix">copii</span>
@@ -415,8 +415,9 @@
     </table>
     <button class="addrow" id="addRow">+ Adaugă o categorie de cheltuială</button>
     <div class="mini-note">
-      <strong>Eticheta <span style="color:var(--amber)">⚡energie</span></strong> marchează categoriile care alimentează efectul în lanț din secțiunea următoare.
-      Combustibilul, chiria existentă, hainele și comunicațiile sunt deja la 20% TVA — ele nu se scumpesc direct, dar resimt scumpirea indirectă (cascada).
+      Sunt incluse doar categoriile afectate direct de reformă, unde TVA crește de la 8% la 20%. Cotele de TVA sunt fixate conform proiectului și nu pot fi modificate.
+      <strong>Eticheta <span style="color:var(--amber)">⚡energie</span></strong> marchează categoriile (gaze, energie electrică) care alimentează efectul în lanț din secțiunea următoare.
+      Poți adăuga și alte cheltuieli proprii (deja la 20% TVA) pentru a vedea cum le afectează scumpirea indirectă.
     </div>
   </section>
 
@@ -480,7 +481,7 @@
 
     <div class="ledger">
       <div class="lrow">
-        <div class="ll">Câștig din reducerea impozitului <small>impozit pe venit 12% → 7% (+ plata pentru copii)</small></div>
+        <div class="ll">Câștig din reducerea impozitului <small>impozit 12% → 7% + plăți directe (500 lei + 200 lei/copil)</small></div>
         <div class="lv pos" id="ledgerSalary">+0 lei</div>
       </div>
       <div class="lrow">
@@ -531,10 +532,10 @@
         <li>Asigurarea medicală (CNAM): <code>9%</code> din brut</li>
         <li>Venit impozabil = <code>brut − CAS − CNAM − scutiri</code></li>
         <li>Impozit pe venit: <code>12%</code> în 2026, <code>7%</code> în 2027 (<code>15%</code> peste 1.000.000 lei/an)</li>
-        <li>Net = <code>brut − CAS − CNAM − impozit (+ plata pentru copii în 2027)</code></li>
+        <li>Net = <code>brut − CAS − CNAM − impozit (+ plăți directe în 2027)</code></li>
       </ul>
-      Scutirea personală în 2026 este <code>2.475 lei/lună</code> (valabilă dacă venitul nu depășește 30.000 lei/lună), scutirea pentru soț/soție <code>1.815 lei/lună</code>, iar pentru fiecare persoană întreținută <code>825 lei/lună</code>.
-      În 2027, conform proiectului, scutirea personală se transformă într-o plată directă de până la <code>500 lei/lună</code> pentru persoanele angajate legal care au copii minori (ipoteza implicită: 500 lei/lună dacă ai cel puțin un copil).
+      <strong>În 2026</strong> scutirea personală este <code>2.475 lei/lună</code> (valabilă dacă venitul nu depășește 30.000 lei/lună), scutirea pentru soț/soție <code>1.815 lei/lună</code>, iar pentru fiecare persoană întreținută <code>825 lei/lună</code>. Comutatoarele pentru scutiri influențează <em>exclusiv</em> coloana 2026.
+      <br><strong>În 2027</strong>, conform proiectului, scutirea personală este <strong>anulată</strong> și înlocuită cu plăți directe: <code>500 lei/lună</code> pentru orice persoană angajată legal și <code>200 lei/lună</code> pentru fiecare copil minor. De aceea coloana 2027 <em>nu</em> depinde de scutiri.
 
       <h4>Scumpirea directă din TVA</h4>
       Presupunem că prețul fără TVA rămâne constant și se schimbă doar cota. Pentru o cheltuială <code>C</code> la cota veche <code>v₀</code> care trece la cota nouă <code>v₁</code>:
@@ -586,21 +587,18 @@
     exSpouse: 1815,
     exDependent: 825,
     exCap: 30000,         // plafon venit lunar pentru scutiri
-    childPay2027: 500     // plata lunară 2027 pt. angajați cu copii minori
+    empBenefit2027: 500,  // 2027: plata directă lunară pt. orice persoană angajată
+    childBen2027: 200     // 2027: plata directă lunară per copil minor
   };
 
   /* ---------------- Coș implicit ---------------- */
-  // vatOld / vatNew în fracții. energy = alimentează cascada. exemptCascade = nu primește scumpire indirectă.
+  // Doar categorii afectate de reformă (TVA redus 8% -> 20%). energy = alimentează cascada.
   const DEFAULT_BASKET = [
-    { ic: "🔥", nm: "Gaze naturale",         ph: "încălzire, gătit",      amt: 600,  vatOld: 0.08, vatNew: 0.20, energy: true },
-    { ic: "💡", nm: "Energie electrică",     ph: "curent electric",       amt: 500,  vatOld: 0.08, vatNew: 0.20, energy: true },
-    { ic: "🛒", nm: "Produse alimentare",    ph: "coș de bază",           amt: 4000, vatOld: 0.08, vatNew: 0.20, energy: false },
-    { ic: "🍽️", nm: "Restaurante / cafenele", ph: "alimentație publică",   amt: 800,  vatOld: 0.08, vatNew: 0.20, energy: false },
-    { ic: "💊", nm: "Medicamente",           ph: "farmacie",              amt: 400,  vatOld: 0.08, vatNew: 0.20, energy: false },
-    { ic: "⛽", nm: "Combustibil",           ph: "deja la 20% TVA",       amt: 1200, vatOld: 0.20, vatNew: 0.20, energy: true },
-    { ic: "🏠", nm: "Chirie / întreținere",  ph: "locuință existentă",    amt: 3000, vatOld: 0.00, vatNew: 0.00, energy: false, exemptCascade: true },
-    { ic: "👕", nm: "Haine și alte bunuri",  ph: "deja la 20% TVA",       amt: 1000, vatOld: 0.20, vatNew: 0.20, energy: false },
-    { ic: "📱", nm: "Comunicații / internet",ph: "deja la 20% TVA",       amt: 400,  vatOld: 0.20, vatNew: 0.20, energy: false }
+    { ic: "🔥", nm: "Gaze naturale",         ph: "încălzire, gătit",    amt: 600,  vatOld: 0.08, vatNew: 0.20, energy: true },
+    { ic: "💡", nm: "Energie electrică",     ph: "curent electric",     amt: 500,  vatOld: 0.08, vatNew: 0.20, energy: true },
+    { ic: "🛒", nm: "Produse alimentare",    ph: "coș de bază",         amt: 4000, vatOld: 0.08, vatNew: 0.20, energy: false },
+    { ic: "🍽️", nm: "Restaurante / cafenele", ph: "alimentație publică", amt: 800,  vatOld: 0.08, vatNew: 0.20, energy: false },
+    { ic: "💊", nm: "Medicamente",           ph: "farmacie",            amt: 400,  vatOld: 0.08, vatNew: 0.20, energy: false }
   ];
 
   let basket = DEFAULT_BASKET.map(o => Object.assign({}, o));
@@ -626,20 +624,22 @@
   function netFromGross(gross, year) {
     const cas = gross * R.cas;
     const cnam = gross * R.cnam;
-    let ex, rate, transfer = 0;
+    let ex, rate, empBenefit = 0, childBenefit = 0;
+    const kids = Math.max(0, parseInt($("children").value) || 0);
     if (year === 2026) {
-      ex = exemptions(gross);
+      ex = exemptions(gross);          // include scutirea personală (doar în 2026)
       rate = R.tax2026;
     } else {
-      ex = 0; // scutirea personală e înlocuită de plata directă
+      ex = 0; // 2027: scutirea personală este ANULATĂ, înlocuită de plăți directe
       rate = gross * 12 > R.highAnnual ? R.tax2027High : R.tax2027;
-      const kids = Math.max(0, parseInt($("children").value) || 0);
-      if (kids > 0) transfer = R.childPay2027;
+      empBenefit = R.empBenefit2027;   // 500 lei pentru orice angajat
+      childBenefit = kids * R.childBen2027; // 200 lei / copil
     }
+    const transfer = empBenefit + childBenefit;
     const taxable = Math.max(0, gross - cas - cnam - ex);
     const tax = taxable * rate;
     const net = gross - cas - cnam - tax + transfer;
-    return { gross, cas, cnam, ex, taxable, tax, transfer, rate, net };
+    return { gross, cas, cnam, ex, taxable, tax, empBenefit, childBenefit, transfer, rate, net };
   }
 
   // inversare numerică: brut din net (regim 2026)
@@ -659,7 +659,8 @@
       <div class="row minus"><span>CNAM (9%)</span><span>−${fmt(d.cnam)}</span></div>
       ${d.ex ? `<div class="row"><span>Scutiri</span><span>${fmt(d.ex)}</span></div>` : ""}
       <div class="row minus"><span>Impozit (${pct(d.rate)})</span><span>−${fmt(d.tax)}</span></div>
-      ${d.transfer ? `<div class="row plus"><span>Plată copii</span><span>+${fmt(d.transfer)}</span></div>` : ""}
+      ${d.empBenefit ? `<div class="row plus"><span>Plată angajat</span><span>+${fmt(d.empBenefit)}</span></div>` : ""}
+      ${d.childBenefit ? `<div class="row plus"><span>Plată copii</span><span>+${fmt(d.childBenefit)}</span></div>` : ""}
     `;
   }
 
@@ -684,11 +685,7 @@
           <input class="amt" type="number" min="0" step="50" inputmode="numeric" data-i="${i}" data-f="amt" value="${it.amt}" />
         </td>
         <td data-label="TVA acum → 2027" class="num">
-          <span class="vat-arrow">
-            <input class="vat" type="number" min="0" max="100" step="1" data-i="${i}" data-f="vatOld" value="${Math.round(it.vatOld*100)}" />%
-            <span>→</span>
-            <input class="vat" type="number" min="0" max="100" step="1" data-i="${i}" data-f="vatNew" value="${Math.round(it.vatNew*100)}" />%
-          </span>
+          <span class="vat-arrow"><b>${Math.round(it.vatOld*100)}%</b> <span>→</span> <b style="color:var(--text)">${Math.round(it.vatNew*100)}%</b></span>
         </td>
         <td data-label="Scumpire" class="delta ${changed ? 'up' : 'flat'}">${changed ? fmtSigned(delta) : '—'}</td>
         <td><button class="rm-btn" data-rm="${i}" title="Șterge">✕</button></td>
@@ -795,12 +792,10 @@
   /* ---------------- Evenimente ---------------- */
   $("basketBody").addEventListener("input", e => {
     const t = e.target;
-    if (t.dataset.f) {
-      const i = +t.dataset.i, f = t.dataset.f;
-      let v = parseFloat(t.value) || 0;
-      if (f === "vatOld" || f === "vatNew") v = Math.max(0, v) / 100;
-      basket[i][f] = v;
-      // re-render doar delta-urile fără a pierde focusul: recalc + update delta cell
+    if (t.dataset.f === "amt") {
+      const i = +t.dataset.i;
+      basket[i].amt = Math.max(0, parseFloat(t.value) || 0);
+      // actualizăm doar celula delta, fără a pierde focusul
       const it = basket[i];
       const base = it.amt / (1 + it.vatOld);
       const delta = base * (1 + it.vatNew) - it.amt;
