@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculator Impact Fiscal 2027 · Moldova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- Geist via CDN (graceful fallback to system fonts if offline) -->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   DESIGN TOKENS — Vercel / Geist aesthetic
+   ============================================================ */
+:root{
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --bg: #ffffff;
+  --bg-subtle: #fafafa;
+  --bg-card: #ffffff;
+  --fg: #0a0a0a;
+  --fg-muted: #666666;
+  --fg-faint: #999999;
+  --border: #ebebeb;
+  --border-strong: #d4d4d4;
+  --accent: #0a0a0a;
+  --up: #e5484d;       /* increases / cost up */
+  --up-bg: #fff0f0;
+  --down: #30a46c;     /* decreases */
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.04);
+  --radius: 10px;
+  --radius-sm: 7px;
+}
+html[data-theme="dark"]{
+  --bg: #000000;
+  --bg-subtle: #0a0a0a;
+  --bg-card: #0c0c0c;
+  --fg: #ededed;
+  --fg-muted: #a1a1a1;
+  --fg-faint: #6e6e6e;
+  --border: #1f1f1f;
+  --border-strong: #2e2e2e;
+  --accent: #ededed;
+  --up: #ff6369;
+  --up-bg: #1f1315;
+  --down: #3dd68c;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 2px 12px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--fg);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600;letter-spacing:-.02em;margin:0;}
+a{color:inherit;}
+button{font-family:inherit;}
+
+/* layout */
+.wrap{max-width:920px;margin:0 auto;padding:0 16px 120px;}
+header.top{
+  position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.top-inner{max-width:920px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.brand{display:flex;align-items:center;gap:9px;font-weight:600;letter-spacing:-.02em;}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--fg);display:inline-block;}
+.brand small{color:var(--fg-faint);font-weight:400;font-size:12px;}
+.spacer{flex:1;}
+.controls{display:flex;align-items:center;gap:6px;}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.seg button{
+  background:transparent;border:0;color:var(--fg-muted);
+  padding:6px 9px;font-size:12px;font-weight:500;cursor:pointer;line-height:1;
+}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg);}
+.iconbtn{
+  background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);
+  width:32px;height:30px;cursor:pointer;color:var(--fg-muted);font-size:14px;display:inline-flex;align-items:center;justify-content:center;
+}
+.iconbtn:hover{border-color:var(--border-strong);color:var(--fg);}
+
+/* hero */
+.hero{padding:40px 0 8px;}
+.hero h1{font-size:30px;line-height:1.12;}
+.hero p.lead{color:var(--fg-muted);margin:12px 0 0;max-width:620px;font-size:15px;}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--up);
+  background:var(--up-bg);border:1px solid color-mix(in srgb,var(--up) 25%,transparent);
+  padding:4px 9px;border-radius:100px;margin-bottom:14px;
+}
+
+/* disclaimer */
+.disclaimer{
+  margin-top:18px;border:1px solid var(--border);border-left:3px solid var(--up);
+  background:var(--bg-subtle);border-radius:var(--radius-sm);padding:12px 14px;
+  font-size:12.5px;color:var(--fg-muted);line-height:1.5;
+}
+
+/* sections */
+section.block{margin-top:34px;}
+.block-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;}
+.block-head .n{font-family:var(--font-mono);font-size:12px;color:var(--fg-faint);}
+.block-head h2{font-size:18px;}
+.block-head .hint{color:var(--fg-faint);font-size:12.5px;margin-left:auto;}
+
+.card{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:18px;
+}
+.card + .card{margin-top:14px;}
+
+/* form */
+.field{margin-bottom:14px;}
+.field:last-child{margin-bottom:0;}
+label.lbl{display:block;font-size:12.5px;color:var(--fg-muted);margin-bottom:6px;font-weight:500;}
+.inputrow{display:flex;align-items:stretch;border:1px solid var(--border-strong);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);transition:border-color .12s;}
+.inputrow:focus-within{border-color:var(--fg);}
+.inputrow .pfx,.inputrow .sfx{display:flex;align-items:center;padding:0 11px;color:var(--fg-faint);font-size:13px;background:var(--bg-subtle);}
+.inputrow input{
+  flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--fg);
+  padding:11px 12px;font-size:16px;font-family:var(--font-mono);font-variant-numeric:tabular-nums;width:100%;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.toggle-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.regime{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{
+  border:1px solid var(--border);background:var(--bg);color:var(--fg-muted);
+  padding:7px 12px;border-radius:100px;font-size:12.5px;cursor:pointer;font-weight:500;transition:.12s;
+}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg);}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:13px;color:var(--fg-muted);}
+.switch input{position:absolute;opacity:0;width:0;height:0;}
+.track{width:38px;height:22px;border-radius:100px;background:var(--border-strong);position:relative;transition:.15s;flex:none;}
+.track::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.3);}
+.switch input:checked + .track{background:var(--fg);}
+.switch input:checked + .track::after{transform:translateX(16px);}
+
+/* salary results */
+.breakdown{margin-top:4px;}
+.brk-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;}
+.brk-row:last-child{border-bottom:0;}
+.brk-row .k{color:var(--fg-muted);display:flex;align-items:center;gap:7px;}
+.brk-row .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.brk-row.minus .v{color:var(--up);}
+.brk-row.total{margin-top:4px;padding-top:13px;border-top:1.5px solid var(--border-strong);border-bottom:0;font-weight:600;font-size:15px;}
+.brk-row.total .v{font-size:17px;}
+
+/* basket table */
+.basket-head,.basket-row{
+  display:grid;
+  grid-template-columns: 1.5fr 0.9fr 0.62fr 0.62fr 0.95fr 0.32fr;
+  gap:8px;align-items:center;
+}
+.basket-head{font-size:11px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:.03em;padding:0 4px 8px;font-weight:600;}
+.basket-row{padding:8px 4px;border-top:1px solid var(--border);}
+.basket-row input,.basket-row select{
+  width:100%;border:1px solid transparent;background:transparent;color:var(--fg);
+  padding:7px 8px;border-radius:6px;font-size:14px;font-family:var(--font-mono);outline:0;min-width:0;
+}
+.basket-row input.name{font-family:var(--font-sans);}
+.basket-row input:hover,.basket-row select:hover{border-color:var(--border);}
+.basket-row input:focus,.basket-row select:focus{border-color:var(--fg);background:var(--bg);}
+.basket-row select{background:var(--bg);cursor:pointer;}
+.basket-row .new{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;padding-right:8px;}
+.basket-row .new .delta{font-size:11.5px;color:var(--up);display:block;}
+.basket-row .new .delta.flat{color:var(--fg-faint);}
+.del{background:transparent;border:0;color:var(--fg-faint);cursor:pointer;font-size:16px;line-height:1;padding:4px;border-radius:6px;}
+.del:hover{color:var(--up);background:var(--up-bg);}
+.energy-tag{font-size:9px;color:var(--fg-faint);border:1px solid var(--border);border-radius:4px;padding:1px 4px;margin-left:6px;vertical-align:middle;letter-spacing:.03em;}
+.addbtn{
+  margin-top:12px;background:transparent;border:1px dashed var(--border-strong);color:var(--fg-muted);
+  width:100%;padding:11px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;
+}
+.addbtn:hover{border-color:var(--fg);color:var(--fg);}
+
+/* cascade */
+.slider-wrap{display:flex;align-items:center;gap:14px;margin-top:14px;}
+input[type=range]{flex:1;accent-color:var(--fg);height:4px;}
+.coef-val{font-family:var(--font-mono);font-size:15px;min-width:48px;text-align:right;}
+.caption{font-size:12px;color:var(--fg-faint);margin-top:10px;line-height:1.5;}
+
+/* headline result */
+.headline{
+  position:sticky;bottom:14px;z-index:30;margin-top:34px;
+  background:var(--bg-card);border:1.5px solid var(--border-strong);border-radius:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,.10);padding:20px;
+}
+html[data-theme="dark"] .headline{box-shadow:0 10px 40px rgba(0,0,0,.6);}
+.headline h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-faint);font-weight:600;margin-bottom:14px;}
+.hl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.hl-stat .lab{font-size:11.5px;color:var(--fg-muted);margin-bottom:4px;}
+.hl-stat .num{font-family:var(--font-mono);font-size:23px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--up);}
+.hl-stat .sub{font-size:11px;color:var(--fg-faint);margin-top:2px;}
+.hl-stat.raise .num{color:var(--fg);}
+.summary{
+  margin-top:16px;padding-top:15px;border-top:1px solid var(--border);
+  font-size:14.5px;line-height:1.55;
+}
+.summary b{font-weight:600;}
+.summary .big{color:var(--up);font-family:var(--font-mono);font-weight:500;}
+
+/* before/after bars */
+.bars{margin-top:16px;}
+.bar-line{margin-bottom:13px;}
+.bar-line .bl-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;color:var(--fg-muted);}
+.bar-line .bl-top .amt{font-family:var(--font-mono);color:var(--fg);}
+.track-bar{height:14px;border-radius:7px;background:var(--bg-subtle);border:1px solid var(--border);overflow:hidden;display:flex;}
+.track-bar .seg-base{height:100%;background:var(--fg);}
+.track-bar .seg-direct{height:100%;background:var(--up);opacity:.9;}
+.track-bar .seg-cascade{height:100%;background:var(--up);opacity:.45;}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--fg-muted);}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+/* collapsible */
+details.assump{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);}
+details.assump > summary{cursor:pointer;padding:14px 18px;font-weight:500;font-size:14px;list-style:none;display:flex;align-items:center;gap:8px;}
+details.assump > summary::-webkit-details-marker{display:none;}
+details.assump > summary::before{content:"+";font-family:var(--font-mono);color:var(--fg-faint);font-size:16px;}
+details.assump[open] > summary::before{content:"–";}
+.assump-body{padding:0 18px 18px;font-size:13px;color:var(--fg-muted);line-height:1.6;}
+.assump-body h4{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-faint);margin:16px 0 6px;}
+.assump-body ul{margin:6px 0;padding-left:18px;}
+.assump-body li{margin-bottom:5px;}
+.assump-body code{font-family:var(--font-mono);background:var(--bg-subtle);padding:1px 5px;border-radius:4px;font-size:12px;}
+.assump-body a{color:var(--fg);text-decoration:underline;text-underline-offset:2px;}
+.tag-assumption{color:var(--up);font-family:var(--font-mono);font-size:11px;}
+
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--fg-faint);line-height:1.6;}
+
+/* ---------- responsive ---------- */
+@media (max-width:680px){
+  .hero h1{font-size:24px;}
+  .grid2{grid-template-columns:1fr;}
+  .hl-grid{grid-template-columns:1fr;gap:12px;}
+  .hl-stat .num{font-size:21px;}
+  .block-head .hint{display:none;}
+
+  /* basket reflows into stacked cards */
+  .basket-head{display:none;}
+  .basket-row{
+    grid-template-columns:1fr auto;
+    gap:6px 10px;
+    border:1px solid var(--border);border-radius:var(--radius-sm);
+    padding:12px;margin-bottom:10px;
+    background:var(--bg-subtle);
+  }
+  .basket-row .name{grid-column:1;font-weight:600;font-size:15px;}
+  .basket-row .del{grid-column:2;grid-row:1;justify-self:end;}
+  .basket-row .cell{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .basket-row .cell::before{content:attr(data-label);font-size:11.5px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:.03em;}
+  .basket-row .cell input,.basket-row .cell select{max-width:160px;border:1px solid var(--border);background:var(--bg);}
+  .basket-row .new{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:6px 0 0;border-top:1px dashed var(--border);}
+  .basket-row .new::before{content:attr(data-label);font-size:11.5px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:.03em;}
+  .basket-row .new .delta{display:inline;margin-left:8px;}
+  .headline{bottom:8px;padding:16px;}
+}
+@media (max-width:380px){
+  .wrap{padding:0 12px 120px;}
+  .brand small{display:none;}
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><span class="dot"></span><span data-i18n="brand">Impact 2027</span><small data-i18n="brandSub">· MD</small></div>
+    <div class="spacer"></div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language">
+        <button data-lang="ro" aria-pressed="true">RO</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+        <button data-lang="ru" aria-pressed="false">RU</button>
+      </div>
+      <button class="iconbtn" id="themeBtn" aria-label="Toggle theme" title="Theme">◐</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="badge"><span>●</span> <span data-i18n="proposalBadge">Proiect de lege · estimări</span></div>
+    <h1 data-i18n="title">Reforma fiscală 2027: cât te costă?</h1>
+    <p class="lead" data-i18n="lead">Eliminarea cotei reduse de TVA de 8% (trecerea la cota standard de 20% pentru gaz, energie, alimente, medicamente, restaurante) îți va scumpi viața. Calculează cu cât și de ce majorare salarială ai avea nevoie ca să nu pierzi putere de cumpărare.</p>
+    <div class="disclaimer" data-i18n="disclaimer">
+      ⚠️ <b>Atenție:</b> Reforma din 2027 este un <b>proiect</b>, nu o lege adoptată (situație la mijlocul anului 2026). Toate cotele, pragurile și sumele sunt <b>estimări/proiecții</b> editabile, nu cifre definitive. Acest instrument nu constituie consultanță financiară. Verifică întotdeauna cu legislația finală.
+    </div>
+  </div>
+
+  <!-- ============ PART A: SALARY ============ -->
+  <section class="block" id="salaryBlock">
+    <div class="block-head">
+      <span class="n">A</span><h2 data-i18n="salaryTitle">Salariul tău</h2>
+      <span class="hint" data-i18n="salaryHint">replică a calculatorului oficial MF</span>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label class="lbl" data-i18n="enterAs">Introdu salariul ca:</label>
+        <div class="toggle-row" role="group">
+          <button class="chip" id="modeGross" aria-pressed="true" data-i18n="gross">Brut</button>
+          <button class="chip" id="modeNet" aria-pressed="false" data-i18n="net">Net (în mână)</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="lbl" for="salaryInput"><span id="salaryInputLabel" data-i18n="grossMonthly">Salariu brut lunar</span></label>
+        <div class="inputrow">
+          <span class="pfx">MDL</span>
+          <input id="salaryInput" inputmode="numeric" autocomplete="off" value="12000" aria-describedby="salaryInputLabel" />
+          <span class="sfx" data-i18n="perMonth">/lună</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="lbl" data-i18n="regime">Regim fiscal</label>
+        <div class="regime" role="group">
+          <button class="chip" data-regime="standard" aria-pressed="true" data-i18n="regimeStd">Standard</button>
+          <button class="chip" data-regime="itpark" aria-pressed="false" data-i18n="regimeIT">IT Park (7%)</button>
+        </div>
+      </div>
+      <label class="switch field" style="margin-top:4px">
+        <input type="checkbox" id="exemptionChk" checked />
+        <span class="track"></span>
+        <span data-i18n="applyExemption">Aplică scutirea personală</span>
+      </label>
+    </div>
+
+    <div class="card" id="salaryResult">
+      <div class="breakdown" id="breakdown"><!-- rendered --></div>
+    </div>
+  </section>
+
+  <!-- ============ PART B: BASKET ============ -->
+  <section class="block" id="basketBlock">
+    <div class="block-head">
+      <span class="n">B</span><h2 data-i18n="basketTitle">Coșul tău lunar de cheltuieli</h2>
+      <span class="hint" data-i18n="basketHint">editează sumele • adaugă/șterge rânduri</span>
+    </div>
+    <div class="card">
+      <div class="basket-head">
+        <div data-i18n="colCategory">Categorie</div>
+        <div data-i18n="colAmount">Sumă acum</div>
+        <div data-i18n="colVatNow">TVA</div>
+        <div data-i18n="colVat27">TVA '27</div>
+        <div style="text-align:right" data-i18n="colNew">După 2027</div>
+        <div></div>
+      </div>
+      <div id="basketRows"><!-- rendered --></div>
+      <button class="addbtn" id="addRow">+ <span data-i18n="addRow">Adaugă categorie</span></button>
+    </div>
+  </section>
+
+  <!-- ============ PART C: CASCADE ============ -->
+  <section class="block" id="cascadeBlock">
+    <div class="block-head">
+      <span class="n">C</span><h2 data-i18n="cascadeTitle">Efectul de cascadă (indirect)</h2>
+    </div>
+    <div class="card">
+      <label class="switch" style="margin-bottom:6px">
+        <input type="checkbox" id="cascadeChk" checked />
+        <span class="track"></span>
+        <span data-i18n="cascadeOn">Include efectul de cascadă</span>
+      </label>
+      <p class="caption" data-i18n="cascadeExplain">Scumpirea energiei (gaz, electricitate, combustibil) crește costul de producție, transport și refrigerare al aproape tuturor bunurilor și serviciilor. Acest cost se transmite în prețuri <i>dincolo</i> de propria modificare de TVA a fiecărui produs. Nu există un multiplicator exact — îl modelăm ca un coeficient ajustabil aplicat doar categoriilor <b>non-energetice</b> (energia nu se majorează din nou, ca să evităm dubla numărare).</p>
+      <div class="slider-wrap">
+        <span class="caption" style="margin:0" data-i18n="pressure">Presiune pe prețuri</span>
+        <input type="range" id="cascadeSlider" min="0" max="10" step="0.5" value="3" />
+        <span class="coef-val mono" id="coefVal">3.0%</span>
+      </div>
+      <p class="caption" data-i18n="cascadeCaveat">⚠️ Estimare. Valoarea implicită (3%) este conservatoare. Mărește/micșorează cursorul pentru a vedea scenarii.</p>
+    </div>
+  </section>
+
+  <!-- ============ PART D: HEADLINE ============ -->
+  <div class="headline" id="headline">
+    <h3 data-i18n="headlineTitle">Concluzia: de cât ai nevoie ca să nu pierzi</h3>
+    <div class="hl-grid">
+      <div class="hl-stat">
+        <div class="lab" data-i18n="extraMonthly">Cost suplimentar / lună</div>
+        <div class="num" id="hlMonthly">—</div>
+        <div class="sub" id="hlMonthlySplit">—</div>
+      </div>
+      <div class="hl-stat">
+        <div class="lab" data-i18n="extraAnnual">Cost suplimentar / an</div>
+        <div class="num" id="hlAnnual">—</div>
+        <div class="sub" data-i18n="perYear">pe an</div>
+      </div>
+      <div class="hl-stat raise">
+        <div class="lab" data-i18n="raiseNeeded">Majorare brută necesară</div>
+        <div class="num" id="hlRaise">—</div>
+        <div class="sub" id="hlRaisePct">—</div>
+      </div>
+    </div>
+    <div class="summary" id="summary"></div>
+    <div class="bars" id="bars"></div>
+  </div>
+
+  <!-- ============ ASSUMPTIONS ============ -->
+  <details class="assump">
+    <summary data-i18n="assumpTitle">Ipoteze & surse</summary>
+    <div class="assump-body" id="assumpBody"></div>
+  </details>
+
+  <footer>
+    <p data-i18n="footer">Construit ca instrument educativ. Cifrele despre reforma 2027 sunt proiecții bazate pe un proiect de politică fiscală și pot diferi de legea finală. Nu constituie consultanță fiscală sau financiară.</p>
+  </footer>
+
+</div>
+
+<script>
+/* =================================================================
+   CONFIG — single source of truth.
+   Every value carries a source comment or an [ASSUMPTION] tag.
+   Update here when the 2027 law is finalized.
+   ================================================================= */
+const CONFIG = {
+  salary: {
+    pit: 0.12,                 // Flat personal income tax 12% (Cod fiscal art.15). Source: mf.gov.md / EurAxess Moldova.
+    cnam: 0.09,                // Employee medical insurance (CNAM) 9% of gross. Source: Law on CNAM funds 2026.
+    cas_employee: 0.00,        // Employee social insurance (CAS/CNAS) — 0% for the general category since the 2018 reform;
+                               //   the 24% social contribution is paid by the EMPLOYER and does not reduce net pay.
+                               //   Source: PwC MD Tax Alert 2/2018; EurAxess. [Editable — some special categories pay 6%.]
+    cas_employer: 0.24,        // Employer-side CAS 24% (informational only; does not affect employee net).
+    personalDeductionAnnual: 29700,   // Scutire personală 2026 = 29 700 MDL/yr (2 475/mo). Source: monitorul.fisc.md (2026 unchanged vs 2025).
+    deductionIncomeCeilingAnnual: 360000, // Exemption withdrawn if annual taxable income > 360 000 MDL. Source: Cod fiscal art.33.
+    itParkSingleTax: 0.07,     // IT Park virtual park single tax 7% of gross (replaces PIT+CAS+CNAM). Source: Law 77/2016 on IT parks.
+  },
+
+  // 2027 reform: reduced 8% rate eliminated -> standard 20% for these consumer categories.
+  // "from" = current effective VAT, "to" = projected 2027 VAT. status: PROPOSAL.
+  vatChanges2027: {
+    standard: 0.20,            // standard rate (unchanged)
+    reduced:  0.08,            // current reduced rate being removed
+  },
+
+  // Default household basket. amounts in MDL/month. All [ASSUMPTION] illustrative averages — EDIT to your reality.
+  // Sources for ballpark: Wise/Numbeo cost-of-living MD 2026, ANRE tariffs, statistica.gov.md. energy=true => driver, excluded from cascade.
+  basketDefaults: [
+    // name key,            amount, vatNow, vat2027, energy
+    { key:'gas',     amount: 800,  vatNow:0.08, vat2027:0.20, energy:true  }, // natural gas to population: reduced 8% -> 20%
+    { key:'power',   amount: 700,  vatNow:0.08, vat2027:0.20, energy:true  }, // electricity [ASSUMPTION 8%->20%]
+    { key:'heat',    amount: 900,  vatNow:0.08, vat2027:0.20, energy:true  }, // district heating / thermal (winter-weighted) [ASSUMPTION]
+    { key:'wood',    amount: 200,  vatNow:0.08, vat2027:0.20, energy:true  }, // firewood / solid fuel
+    { key:'water',   amount: 250,  vatNow:0.20, vat2027:0.20, energy:false }, // water already 20% -> no direct change, cascade applies
+    { key:'food',    amount: 4000, vatNow:0.08, vat2027:0.20, energy:false }, // bread/dairy/staples at reduced 8% (blended) [ASSUMPTION]
+    { key:'meds',    amount: 400,  vatNow:0.08, vat2027:0.20, energy:false }, // medicines 8% -> 20%
+    { key:'resto',   amount: 800,  vatNow:0.08, vat2027:0.20, energy:false }, // restaurants/hotels/cafes (HoReCa) 8% -> 20%
+    { key:'fuel',    amount: 1500, vatNow:0.20, vat2027:0.20, energy:true  }, // fuel already 20% -> no direct change (energy driver)
+    { key:'telecom', amount: 400,  vatNow:0.20, vat2027:0.20, energy:false }, // telecom/internet already 20%, cascade applies
+    { key:'rent',    amount: 4000, vatNow:0.00, vat2027:0.00, energy:false }, // residential rent VAT-exempt; cascade applies lightly
+    { key:'other',   amount: 1000, vatNow:0.20, vat2027:0.20, energy:false }, // misc goods/services
+  ],
+
+  cascade: {
+    coefficient: 0.03,         // [ASSUMPTION] 3% energy-driven price pressure on non-energy categories. Conservative default.
+    enabledByDefault: true,
+  },
+
+  meta: {
+    status: 'PROPOSAL',
+    lastUpdated: '2026-06',
+  },
+};
+
+/* =================================================================
+   I18N — Romanian default, EN + RU toggles.
+   ================================================================= */
+const I18N = {
+  ro:{
+    brand:'Impact 2027', brandSub:'· MD',
+    proposalBadge:'Proiect de lege · estimări',
+    title:'Reforma fiscală 2027: cât te costă?',
+    lead:'Eliminarea cotei reduse de TVA de 8% (trecerea la cota standard de 20% pentru gaz, energie, alimente, medicamente, restaurante) îți va scumpi viața. Calculează cu cât și de ce majorare salarială ai avea nevoie ca să nu pierzi putere de cumpărare.',
+    disclaimer:'⚠️ <b>Atenție:</b> Reforma din 2027 este un <b>proiect</b>, nu o lege adoptată (situație la mijlocul anului 2026). Toate cotele, pragurile și sumele sunt <b>estimări/proiecții</b> editabile, nu cifre definitive. Acest instrument nu constituie consultanță financiară. Verifică întotdeauna cu legislația finală.',
+    salaryTitle:'Salariul tău', salaryHint:'replică a calculatorului oficial MF',
+    enterAs:'Introdu salariul ca:', gross:'Brut', net:'Net (în mână)',
+    grossMonthly:'Salariu brut lunar', netMonthly:'Salariu net lunar (în mână)',
+    perMonth:'/lună', regime:'Regim fiscal', regimeStd:'Standard', regimeIT:'IT Park (7%)',
+    applyExemption:'Aplică scutirea personală',
+    basketTitle:'Coșul tău lunar de cheltuieli', basketHint:'editează sumele • adaugă/șterge rânduri',
+    colCategory:'Categorie', colAmount:'Sumă acum', colVatNow:'TVA', colVat27:"TVA '27", colNew:'După 2027',
+    addRow:'Adaugă categorie',
+    cascadeTitle:'Efectul de cascadă (indirect)',
+    cascadeOn:'Include efectul de cascadă',
+    cascadeExplain:'Scumpirea energiei (gaz, electricitate, combustibil) crește costul de producție, transport și refrigerare al aproape tuturor bunurilor și serviciilor. Acest cost se transmite în prețuri <i>dincolo</i> de propria modificare de TVA a fiecărui produs. Nu există un multiplicator exact — îl modelăm ca un coeficient ajustabil aplicat doar categoriilor <b>non-energetice</b> (energia nu se majorează din nou, ca să evităm dubla numărare).',
+    pressure:'Presiune pe prețuri',
+    cascadeCaveat:'⚠️ Estimare. Valoarea implicită (3%) este conservatoare. Mărește/micșorează cursorul pentru a vedea scenarii.',
+    headlineTitle:'Concluzia: de cât ai nevoie ca să nu pierzi',
+    extraMonthly:'Cost suplimentar / lună', extraAnnual:'Cost suplimentar / an',
+    raiseNeeded:'Majorare brută necesară', perYear:'pe an',
+    assumpTitle:'Ipoteze & surse',
+    footer:'Construit ca instrument educativ. Cifrele despre reforma 2027 sunt proiecții bazate pe un proiect de politică fiscală și pot diferi de legea finală. Nu constituie consultanță fiscală sau financiară.',
+    // breakdown labels
+    bGross:'Salariu brut', bCnam:'CNAM (asig. medicală 9%)', bCas:'CAS (asig. socială)',
+    bExempt:'Scutire personală', bTaxable:'Venit impozabil', bPit:'Impozit pe venit (12%)',
+    bItTax:'Impozit unic IT Park (7%)', bNet:'Salariu net (în mână)', bEmployerCost:'Cost angajator (info)',
+    // categories
+    cat_gas:'Gaz natural', cat_power:'Energie electrică', cat_heat:'Încălzire (termică)',
+    cat_wood:'Lemn / combustibil solid', cat_water:'Apă', cat_food:'Alimente', cat_meds:'Medicamente',
+    cat_resto:'Restaurante / cafenele', cat_fuel:'Combustibil / transport', cat_telecom:'Telecom / internet',
+    cat_rent:'Chirie', cat_other:'Altele', cat_new:'Categorie nouă',
+    energyTag:'energie',
+    lblAmount:'Sumă acum', lblVatNow:'TVA acum', lblVat27:"TVA 2027", lblNew:'După 2027',
+    summaryTpl:'Ca să absorbi schimbările din 2027 fără a pierde putere de cumpărare, salariul tău <b>brut</b> ar trebui să crească cu aproximativ <span class="big">{raise} MDL/lună</span> (<span class="big">{pct}</span>). Din acestea, <b>{direct} MDL</b> sunt din modificări directe de TVA și <b>{cascade} MDL</b> din efectul estimat de cascadă.',
+    summaryNoCascade:'Ca să absorbi schimbările directe de TVA din 2027 fără a pierde putere de cumpărare, salariul tău <b>brut</b> ar trebui să crească cu aproximativ <span class="big">{raise} MDL/lună</span> (<span class="big">{pct}</span>).',
+    barNow:'Coș lunar — acum', barAfter:'Coș lunar — 2027',
+    legBase:'Cost actual', legDirect:'TVA direct', legCascade:'Cascadă (est.)',
+    splitTpl:'{direct} direct + {cascade} cascadă',
+  },
+  en:{
+    brand:'Impact 2027', brandSub:'· MD',
+    proposalBadge:'Draft law · estimates',
+    title:'Moldova 2027 tax reform: what will it cost you?',
+    lead:'Scrapping the reduced 8% VAT rate (moving gas, energy, food, medicines and restaurants to the standard 20%) will raise your cost of living. See by how much — and the pay rise you would need just to break even.',
+    disclaimer:'⚠️ <b>Note:</b> The 2027 reform is a <b>proposal</b>, not enacted law (as of mid-2026). Every rate, threshold and amount is an editable <b>estimate/projection</b>, not a settled figure. This tool is not financial advice. Always verify against the final legislation.',
+    salaryTitle:'Your salary', salaryHint:'mirror of the official MF calculator',
+    enterAs:'Enter salary as:', gross:'Gross', net:'Net (take-home)',
+    grossMonthly:'Monthly gross salary', netMonthly:'Monthly net (take-home) salary',
+    perMonth:'/mo', regime:'Tax regime', regimeStd:'Standard', regimeIT:'IT Park (7%)',
+    applyExemption:'Apply personal exemption',
+    basketTitle:'Your monthly cost basket', basketHint:'edit amounts • add/remove rows',
+    colCategory:'Category', colAmount:'Amount now', colVatNow:'VAT', colVat27:"VAT '27", colNew:'After 2027',
+    addRow:'Add category',
+    cascadeTitle:'Cascade (second-order) effect',
+    cascadeOn:'Include cascade effect',
+    cascadeExplain:'Higher energy prices (gas, electricity, fuel) raise the production, transport and refrigeration cost of nearly all goods and services. That feeds into prices <i>beyond</i> each item\'s own VAT change. There is no exact multiplier — we model it as an adjustable coefficient applied only to <b>non-energy</b> categories (energy is not bumped again, to avoid double-counting).',
+    pressure:'Price pressure',
+    cascadeCaveat:'⚠️ Estimate. The 3% default is conservative. Move the slider to explore scenarios.',
+    headlineTitle:'Bottom line: the raise you need',
+    extraMonthly:'Extra cost / month', extraAnnual:'Extra cost / year',
+    raiseNeeded:'Gross raise needed', perYear:'per year',
+    assumpTitle:'Assumptions & sources',
+    footer:'Built as an educational tool. The 2027 figures are projections based on a draft fiscal policy and may differ from the final law. Not tax or financial advice.',
+    bGross:'Gross salary', bCnam:'CNAM (medical 9%)', bCas:'CAS (social)',
+    bExempt:'Personal exemption', bTaxable:'Taxable income', bPit:'Income tax (12%)',
+    bItTax:'IT Park single tax (7%)', bNet:'Net salary (take-home)', bEmployerCost:'Employer cost (info)',
+    cat_gas:'Natural gas', cat_power:'Electricity', cat_heat:'Heating (thermal)',
+    cat_wood:'Firewood / solid fuel', cat_water:'Water', cat_food:'Groceries / food', cat_meds:'Medicines',
+    cat_resto:'Restaurants / cafes', cat_fuel:'Fuel / transport', cat_telecom:'Telecom / internet',
+    cat_rent:'Rent', cat_other:'Other', cat_new:'New category',
+    energyTag:'energy',
+    lblAmount:'Amount now', lblVatNow:'VAT now', lblVat27:'VAT 2027', lblNew:'After 2027',
+    summaryTpl:'To absorb the 2027 changes without losing purchasing power, your <b>gross</b> salary would need to rise by about <span class="big">{raise} MDL/month</span> (<span class="big">{pct}</span>). Of that, <b>{direct} MDL</b> comes from direct VAT changes and <b>{cascade} MDL</b> from the estimated cascade effect.',
+    summaryNoCascade:'To absorb the direct 2027 VAT changes without losing purchasing power, your <b>gross</b> salary would need to rise by about <span class="big">{raise} MDL/month</span> (<span class="big">{pct}</span>).',
+    barNow:'Monthly basket — now', barAfter:'Monthly basket — 2027',
+    legBase:'Current cost', legDirect:'Direct VAT', legCascade:'Cascade (est.)',
+    splitTpl:'{direct} direct + {cascade} cascade',
+  },
+  ru:{
+    brand:'Impact 2027', brandSub:'· MD',
+    proposalBadge:'Законопроект · оценки',
+    title:'Налоговая реформа 2027: во что она вам обойдётся?',
+    lead:'Отмена льготной ставки НДС 8% (переход на стандартные 20% для газа, энергии, продуктов, лекарств и ресторанов) повысит ваши расходы. Узнайте насколько — и какая прибавка к зарплате нужна, чтобы не потерять покупательную способность.',
+    disclaimer:'⚠️ <b>Внимание:</b> Реформа 2027 года — это <b>проект</b>, а не принятый закон (по состоянию на середину 2026). Все ставки, пороги и суммы — редактируемые <b>оценки/прогнозы</b>, а не окончательные цифры. Это не финансовая консультация. Всегда сверяйтесь с итоговым законодательством.',
+    salaryTitle:'Ваша зарплата', salaryHint:'копия официального калькулятора МФ',
+    enterAs:'Ввести зарплату как:', gross:'Брутто', net:'Нетто (на руки)',
+    grossMonthly:'Месячная зарплата брутто', netMonthly:'Месячная зарплата нетто (на руки)',
+    perMonth:'/мес', regime:'Налоговый режим', regimeStd:'Стандартный', regimeIT:'IT Park (7%)',
+    applyExemption:'Применить личный вычет',
+    basketTitle:'Ваша месячная корзина расходов', basketHint:'меняйте суммы • добавляйте/удаляйте',
+    colCategory:'Категория', colAmount:'Сумма сейчас', colVatNow:'НДС', colVat27:"НДС '27", colNew:'После 2027',
+    addRow:'Добавить категорию',
+    cascadeTitle:'Каскадный (косвенный) эффект',
+    cascadeOn:'Учитывать каскадный эффект',
+    cascadeExplain:'Удорожание энергии (газ, электричество, топливо) повышает стоимость производства, транспортировки и хранения почти всех товаров и услуг. Это отражается в ценах <i>сверх</i> собственного изменения НДS каждого товара. Точного множителя нет — мы моделируем его как регулируемый коэффициент, применяемый только к <b>неэнергетическим</b> категориям (энергия повторно не повышается во избежание двойного счёта).',
+    pressure:'Давление на цены',
+    cascadeCaveat:'⚠️ Оценка. Значение по умолчанию (3%) консервативно. Двигайте ползунок для сценариев.',
+    headlineTitle:'Итог: необходимая прибавка',
+    extraMonthly:'Доп. расходы / мес', extraAnnual:'Доп. расходы / год',
+    raiseNeeded:'Нужна прибавка брутто', perYear:'в год',
+    assumpTitle:'Допущения и источники',
+    footer:'Создано как образовательный инструмент. Цифры на 2027 — прогнозы на основе проекта налоговой политики и могут отличаться от итогового закона. Не является налоговой или финансовой консультацией.',
+    bGross:'Зарплата брутто', bCnam:'CNAM (медстрах. 9%)', bCas:'CAS (соцстрах.)',
+    bExempt:'Личный вычет', bTaxable:'Облагаемый доход', bPit:'Подоходный налог (12%)',
+    bItTax:'Единый налог IT Park (7%)', bNet:'Зарплата нетто (на руки)', bEmployerCost:'Расходы работодателя (инфо)',
+    cat_gas:'Природный газ', cat_power:'Электроэнергия', cat_heat:'Отопление (тепло)',
+    cat_wood:'Дрова / твёрдое топливо', cat_water:'Вода', cat_food:'Продукты', cat_meds:'Лекарства',
+    cat_resto:'Рестораны / кафе', cat_fuel:'Топливо / транспорт', cat_telecom:'Связь / интернет',
+    cat_rent:'Аренда', cat_other:'Прочее', cat_new:'Новая категория',
+    energyTag:'энергия',
+    lblAmount:'Сумма сейчас', lblVatNow:'НДС сейчас', lblVat27:'НДС 2027', lblNew:'После 2027',
+    summaryTpl:'Чтобы компенсировать изменения 2027 года без потери покупательной способности, ваша зарплата <b>брутто</b> должна вырасти примерно на <span class="big">{raise} MDL/мес</span> (<span class="big">{pct}</span>). Из них <b>{direct} MDL</b> — от прямых изменений НДС и <b>{cascade} MDL</b> — от оценочного каскадного эффекта.',
+    summaryNoCascade:'Чтобы компенсировать прямые изменения НДС 2027 года без потери покупательной способности, ваша зарплата <b>брутто</b> должна вырасти примерно на <span class="big">{raise} MDL/мес</span> (<span class="big">{pct}</span>).',
+    barNow:'Корзина за месяц — сейчас', barAfter:'Корзина за месяц — 2027',
+    legBase:'Текущая стоимость', legDirect:'Прямой НДС', legCascade:'Каскад (оц.)',
+    splitTpl:'{direct} прямой + {cascade} каскад',
+  },
+};
+
+/* =================================================================
+   STATE
+   ================================================================= */
+let state = {
+  lang: 'ro',
+  inputMode: 'gross',          // 'gross' | 'net'
+  regime: 'standard',          // 'standard' | 'itpark'
+  applyExemption: true,
+  salaryValue: 12000,          // the number the user typed (interpreted per inputMode)
+  basket: CONFIG.basketDefaults.map(d => ({...d})),
+  cascadeOn: CONFIG.cascade.enabledByDefault,
+  cascadeCoef: CONFIG.cascade.coefficient,
+};
+
+const T = () => I18N[state.lang];
+
+/* =================================================================
+   FORMATTING
+   ================================================================= */
+function fmt(n, dec=0){
+  if(!isFinite(n)) n = 0;
+  return n.toLocaleString('ro-RO', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function fmtMDL(n){ return fmt(Math.round(n)); }
+
+/* =================================================================
+   SALARY MATH — mirrors official MF formula.
+   Taxable = Gross - CNAM - CAS_employee - exemption(monthly)
+   PIT     = 12% * max(0, Taxable)
+   Net     = Gross - CNAM - CAS_employee - PIT
+   IT Park : Net = Gross * (1 - 7%)
+   ================================================================= */
+function monthlyExemption(grossMonthly){
+  if(!state.applyExemption) return 0;
+  const annual = grossMonthly * 12;
+  if(annual > CONFIG.salary.deductionIncomeCeilingAnnual) return 0; // exemption withdrawn above ceiling
+  return CONFIG.salary.personalDeductionAnnual / 12;
+}
+
+// Full breakdown from a GROSS monthly figure.
+function grossToNet(gross){
+  gross = Math.max(0, gross);
+  const s = CONFIG.salary;
+  if(state.regime === 'itpark'){
+    const tax = gross * s.itParkSingleTax;
+    return {
+      gross, cnam:0, cas:0, exemption:0, taxable:0, pit:0,
+      itTax:tax, net: gross - tax, employerCost: gross,
+    };
+  }
+  const cnam = gross * s.cnam;
+  const cas  = gross * s.cas_employee;
+  const exemption = monthlyExemption(gross);
+  const taxable = Math.max(0, gross - cnam - cas - exemption);
+  const pit = taxable * s.pit;
+  const net = gross - cnam - cas - pit;
+  const employerCost = gross + gross * s.cas_employer;
+  return { gross, cnam, cas, exemption, taxable, pit, itTax:0, net, employerCost };
+}
+
+// Invert: solve for the GROSS that yields a given NET (monotonic -> bisection).
+function netToGross(targetNet){
+  targetNet = Math.max(0, targetNet);
+  if(targetNet === 0) return 0;
+  let lo = targetNet, hi = targetNet * 3 + 100000;
+  for(let i=0;i<80;i++){
+    const mid = (lo+hi)/2;
+    const net = grossToNet(mid).net;
+    if(net < targetNet) lo = mid; else hi = mid;
+  }
+  return (lo+hi)/2;
+}
+
+// Resolve current gross/net pair from whatever the user entered.
+function currentSalary(){
+  const v = state.salaryValue || 0;
+  if(state.inputMode === 'gross'){
+    return grossToNet(v);
+  } else {
+    const gross = netToGross(v);
+    return grossToNet(gross);
+  }
+}
+
+/* =================================================================
+   BASKET MATH
+   For each line: base = amount / (1 + vatNow)
+   directNew     = base * (1 + vat2027)
+   directDelta   = directNew - amount
+   cascadeDelta  = (non-energy & cascade on) ? amount * coef : 0
+   newTotal      = directNew + cascadeDelta
+   ================================================================= */
+function computeBasket(){
+  let baseSum=0, directDeltaSum=0, cascadeSum=0, oldSum=0, newSum=0;
+  const lines = state.basket.map(item=>{
+    const amount = Math.max(0, +item.amount || 0);
+    const base = amount / (1 + item.vatNow);
+    const directNew = base * (1 + item.vat2027);
+    const directDelta = directNew - amount;
+    const cascadeDelta = (!item.energy && state.cascadeOn) ? amount * state.cascadeCoef : 0;
+    const newTotal = directNew + cascadeDelta;
+    oldSum += amount; newSum += newTotal;
+    baseSum += base; directDeltaSum += directDelta; cascadeSum += cascadeDelta;
+    return { ...item, amount, base, directNew, directDelta, cascadeDelta, newTotal,
+             totalDelta:newTotal-amount, pct: amount>0 ? (newTotal-amount)/amount : 0 };
+  });
+  return { lines, oldSum, newSum, directDeltaSum, cascadeSum,
+           totalDelta: directDeltaSum + cascadeSum };
+}
+
+/* =================================================================
+   CONCLUSION — required gross raise to net the extra monthly cost.
+   We solve through the REAL salary function (handles exemption
+   ceiling, IT Park), so the raise's own taxation is accounted for.
+   raise = grossFor(currentNet + extra) - currentGross
+   ================================================================= */
+function computeConclusion(){
+  const cur = currentSalary();
+  const b = computeBasket();
+  const extra = b.totalDelta;
+  const targetNet = cur.net + extra;
+  const neededGross = netToGross(targetNet);
+  const raise = Math.max(0, neededGross - cur.gross);
+  const raisePct = cur.gross>0 ? raise/cur.gross : 0;
+  return { cur, basket:b, extra, raise, raisePct,
+           annual: extra*12 };
+}
+
+/* =================================================================
+   RENDER
+   ================================================================= */
+function renderBreakdown(){
+  const t=T(); const r=currentSalary(); const el=document.getElementById('breakdown');
+  let rows='';
+  const row=(k,v,cls='')=>`<div class="brk-row ${cls}"><span class="k">${k}</span><span class="v">${v} <span style="color:var(--fg-faint)">MDL</span></span></div>`;
+  rows += row(t.bGross, fmtMDL(r.gross));
+  if(state.regime==='itpark'){
+    rows += row(t.bItTax, '−'+fmtMDL(r.itTax)).replace('brk-row ','brk-row minus ');
+  } else {
+    rows += row(t.bCnam, '−'+fmtMDL(r.cnam)).replace('brk-row ','brk-row minus ');
+    if(CONFIG.salary.cas_employee>0)
+      rows += row(t.bCas, '−'+fmtMDL(r.cas)).replace('brk-row ','brk-row minus ');
+    if(state.applyExemption && r.exemption>0)
+      rows += `<div class="brk-row"><span class="k">${t.bExempt}</span><span class="v" style="color:var(--fg-faint)">−${fmtMDL(r.exemption)} MDL</span></div>`;
+    rows += `<div class="brk-row"><span class="k">${t.bTaxable}</span><span class="v" style="color:var(--fg-muted)">${fmtMDL(r.taxable)} MDL</span></div>`;
+    rows += row(t.bPit, '−'+fmtMDL(r.pit)).replace('brk-row ','brk-row minus ');
+  }
+  rows += row(t.bNet, fmtMDL(r.net),'total');
+  el.innerHTML = rows;
+}
+
+function vatOptions(sel){
+  const opts=[0,0.08,0.20];
+  return opts.map(v=>`<option value="${v}" ${Math.abs(v-sel)<1e-9?'selected':''}>${v===0?'0%':(v*100)+'%'}</option>`).join('');
+}
+
+function renderBasket(){
+  const t=T(); const wrap=document.getElementById('basketRows');
+  const b=computeBasket();
+  wrap.innerHTML = b.lines.map((ln,i)=>{
+    const name = ln.custom ? (ln.name||'') : t['cat_'+ln.key];
+    const deltaCls = Math.abs(ln.totalDelta)<0.5 ? 'flat':'';
+    const deltaTxt = Math.abs(ln.totalDelta)<0.5 ? '±0'
+        : (ln.totalDelta>0?'+':'−')+fmtMDL(Math.abs(ln.totalDelta))+' ('+(ln.totalDelta>0?'+':'−')+fmt(Math.abs(ln.pct*100),0)+'%)';
+    return `<div class="basket-row" data-i="${i}">
+      <input class="name" value="${escapeHtml(name)}" data-f="name" aria-label="${t.colCategory}" />
+      <div class="cell" data-label="${t.lblAmount}"><input inputmode="numeric" class="mono" value="${fmt(ln.amount)}" data-f="amount" aria-label="${t.lblAmount}" /></div>
+      <div class="cell" data-label="${t.lblVatNow}"><select data-f="vatNow" aria-label="${t.lblVatNow}">${vatOptions(ln.vatNow)}</select></div>
+      <div class="cell" data-label="${t.lblVat27}"><select data-f="vat2027" aria-label="${t.lblVat27}">${vatOptions(ln.vat2027)}</select></div>
+      <div class="new" data-label="${t.lblNew}">
+        <span>${fmtMDL(ln.newTotal)}${ln.energy?` <span class="energy-tag">${t.energyTag}</span>`:''}</span>
+        <span class="delta ${deltaCls}">${deltaTxt}</span>
+      </div>
+      <button class="del" data-del="${i}" aria-label="Delete">×</button>
+    </div>`;
+  }).join('');
+}
+
+function renderHeadline(){
+  const t=T(); const c=computeConclusion();
+  document.getElementById('hlMonthly').textContent = '+'+fmtMDL(c.extra)+' MDL';
+  document.getElementById('hlAnnual').textContent  = '+'+fmtMDL(c.annual)+' MDL';
+  document.getElementById('hlRaise').textContent   = '+'+fmtMDL(c.raise)+' MDL';
+  document.getElementById('hlRaisePct').textContent= '+'+fmt(c.raisePct*100,1)+'% · '+t.perMonth.replace('/','');
+  document.getElementById('hlMonthlySplit').textContent =
+     t.splitTpl.replace('{direct}',fmtMDL(c.basket.directDeltaSum)).replace('{cascade}',fmtMDL(c.basket.cascadeSum));
+
+  // summary
+  const tpl = (state.cascadeOn && c.basket.cascadeSum>0.5) ? t.summaryTpl : t.summaryNoCascade;
+  document.getElementById('summary').innerHTML = tpl
+    .replace('{raise}', fmtMDL(c.raise))
+    .replace('{pct}', '+'+fmt(c.raisePct*100,1)+'%')
+    .replace('{direct}', fmtMDL(c.basket.directDeltaSum))
+    .replace('{cascade}', fmtMDL(c.basket.cascadeSum));
+
+  // before/after bars
+  const b=c.basket;
+  const max = Math.max(b.oldSum, b.newSum) || 1;
+  const seg=(w,cls)=>`<div class="${cls}" style="width:${Math.max(0,w/max*100)}%"></div>`;
+  document.getElementById('bars').innerHTML = `
+    <div class="bar-line">
+      <div class="bl-top"><span>${t.barNow}</span><span class="amt">${fmtMDL(b.oldSum)} MDL</span></div>
+      <div class="track-bar">${seg(b.oldSum,'seg-base')}</div>
+    </div>
+    <div class="bar-line">
+      <div class="bl-top"><span>${t.barAfter}</span><span class="amt">${fmtMDL(b.newSum)} MDL</span></div>
+      <div class="track-bar">${seg(b.oldSum,'seg-base')}${seg(b.directDeltaSum,'seg-direct')}${seg(b.cascadeSum,'seg-cascade')}</div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--fg)"></i>${t.legBase}</span>
+      <span><i style="background:var(--up)"></i>${t.legDirect}</span>
+      <span><i style="background:var(--up);opacity:.45"></i>${t.legCascade}</span>
+    </div>`;
+}
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+function renderAll(){ renderBreakdown(); renderBasket(); renderHeadline(); }
+
+/* =================================================================
+   I18N application
+   ================================================================= */
+function applyI18n(){
+  const t=T();
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n'); if(t[k]!==undefined) el.innerHTML=t[k];
+  });
+  // dynamic salary input label
+  document.getElementById('salaryInputLabel').textContent =
+     state.inputMode==='gross' ? t.grossMonthly : t.netMonthly;
+  document.getElementById('modeGross').textContent=t.gross;
+  document.getElementById('modeNet').textContent=t.net;
+  renderAssumptions();
+  renderAll();
+}
+
+function renderAssumptions(){
+  const s=CONFIG.salary;
+  const body=document.getElementById('assumpBody');
+  const A='<span class="tag-assumption">[ASSUMPTION]</span>';
+  body.innerHTML = `
+  <h4>Salariu / Payroll</h4>
+  <ul>
+    <li><code>PIT = ${(s.pit*100)}%</code> — impozit pe venit forfetar / flat income tax.</li>
+    <li><code>CNAM = ${(s.cnam*100)}%</code> — asigurare medicală angajat / employee medical insurance.</li>
+    <li><code>CAS angajat = ${(s.cas_employee*100)}%</code> — contribuția socială a angajatului (transferată la angajator din 2018; angajatorul plătește ${(s.cas_employer*100)}%). ${s.cas_employee===0?'Unele categorii speciale plătesc 6%.':''}</li>
+    <li><code>Scutire personală = ${fmt(s.personalDeductionAnnual)} MDL/an</code> (${fmt(s.personalDeductionAnnual/12)} MDL/lună), eliminată peste un venit anual de ${fmt(s.deductionIncomeCeilingAnnual)} MDL.</li>
+    <li><code>IT Park = ${(s.itParkSingleTax*100)}%</code> impozit unic pe salariu (înlocuiește PIT+CAS+CNAM).</li>
+    <li>Formule: <code>Impozabil = Brut − CNAM − CAS − Scutire</code>; <code>Net = Brut − CNAM − CAS − Impozit</code>.</li>
+  </ul>
+  <h4>TVA 2027 (proiect / proposal)</h4>
+  <ul>
+    <li>Cota redusă de <code>8%</code> este eliminată; bunurile/serviciile trec la cota standard <code>20%</code>.</li>
+    <li>Vizate: gaz natural, energie electrică ${A}, energie termică ${A}, lemn de foc, alimente de bază (pâine/lactate) ${A}, medicamente, restaurante & hoteluri (HoReCa).</li>
+    <li>Deja la 20% (fără modificare directă, dar afectate de cascadă): apă, combustibil, telecom.</li>
+    <li>Chiria rezidențială: scutită de TVA / VAT-exempt.</li>
+    <li>Sumele implicite din coș sunt ilustrative ${A} — editează-le după realitatea ta.</li>
+  </ul>
+  <h4>Cascadă / Cascade</h4>
+  <ul>
+    <li>Coeficient implicit <code>${(CONFIG.cascade.coefficient*100)}%</code> ${A} — presiune pe prețuri din scumpirea energiei, aplicată doar categoriilor non-energetice (fără dublă numărare).</li>
+    <li>Nu există un multiplicator exact; tratează-l ca un scenariu, nu o certitudine.</li>
+  </ul>
+  <h4>Surse / Sources</h4>
+  <ul>
+    <li><a href="https://www.mf.gov.md/" target="_blank" rel="noopener">Ministerul Finanțelor (mf.gov.md)</a> — calculator salariu, modificări Cod fiscal 2026.</li>
+    <li><a href="https://monitorul.fisc.md/" target="_blank" rel="noopener">monitorul.fisc.md</a> — scutiri personale 2026.</li>
+    <li><a href="https://taxsummaries.pwc.com/moldova" target="_blank" rel="noopener">PwC Worldwide Tax Summaries — Moldova</a>.</li>
+    <li><a href="https://www.vatcalc.com/moldova/moldova-vat-modernisation-for-eu-accession/" target="_blank" rel="noopener">vatcalc.com</a> — modernizarea TVA pentru aderarea la UE.</li>
+    <li>Cost-of-living: Wise / Numbeo / statistica.gov.md / ANRE (tarife).</li>
+  </ul>
+  <p style="margin-top:14px"><b>Status:</b> ${CONFIG.meta.status} · <b>Actualizat:</b> ${CONFIG.meta.lastUpdated}. Verifică întotdeauna legislația finală.</p>`;
+}
+
+/* =================================================================
+   EVENTS
+   ================================================================= */
+// language
+document.querySelectorAll('[data-lang]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.lang=btn.getAttribute('data-lang');
+    document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed', b===btn));
+    applyI18n();
+  });
+});
+// theme
+const themeBtn=document.getElementById('themeBtn');
+function setTheme(th){ document.documentElement.setAttribute('data-theme',th); themeBtn.textContent = th==='dark'?'☀':'◐'; }
+themeBtn.addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  setTheme(cur);
+});
+// init theme from system
+setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+
+// salary input mode
+document.getElementById('modeGross').addEventListener('click',()=>switchMode('gross'));
+document.getElementById('modeNet').addEventListener('click',()=>switchMode('net'));
+function switchMode(m){
+  // convert displayed value so the figure stays consistent
+  const r=currentSalary();
+  state.inputMode=m;
+  const newVal = m==='gross'? r.gross : r.net;
+  state.salaryValue=Math.round(newVal);
+  document.getElementById('salaryInput').value=fmt(Math.round(newVal));
+  document.getElementById('modeGross').setAttribute('aria-pressed', m==='gross');
+  document.getElementById('modeNet').setAttribute('aria-pressed', m==='net');
+  document.getElementById('salaryInputLabel').textContent = m==='gross'?T().grossMonthly:T().netMonthly;
+  renderAll();
+}
+// salary value
+const salaryInput=document.getElementById('salaryInput');
+salaryInput.addEventListener('input',()=>{
+  state.salaryValue = parseNum(salaryInput.value);
+  renderAll();
+});
+salaryInput.addEventListener('blur',()=>{ salaryInput.value=fmt(state.salaryValue); });
+function parseNum(s){ const n=parseFloat(String(s).replace(/[^\d.,-]/g,'').replace(/\s/g,'').replace(/\.(?=\d{3})/g,'').replace(',','.')); return isNaN(n)?0:n; }
+
+// regime
+document.querySelectorAll('[data-regime]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.regime=btn.getAttribute('data-regime');
+    document.querySelectorAll('[data-regime]').forEach(b=>b.setAttribute('aria-pressed', b===btn));
+    renderAll();
+  });
+});
+// exemption
+document.getElementById('exemptionChk').addEventListener('change',e=>{
+  state.applyExemption=e.target.checked; renderAll();
+});
+// cascade
+document.getElementById('cascadeChk').addEventListener('change',e=>{ state.cascadeOn=e.target.checked; renderAll(); });
+const slider=document.getElementById('cascadeSlider');
+slider.addEventListener('input',()=>{
+  state.cascadeCoef=parseFloat(slider.value)/100;
+  document.getElementById('coefVal').textContent=parseFloat(slider.value).toFixed(1)+'%';
+  renderAll();
+});
+
+// basket delegation (edit + delete)
+document.getElementById('basketRows').addEventListener('input',e=>{
+  const row=e.target.closest('.basket-row'); if(!row) return;
+  const i=+row.getAttribute('data-i'); const f=e.target.getAttribute('data-f'); if(!f) return;
+  const item=state.basket[i];
+  if(f==='name'){ item.name=e.target.value; item.custom=true; }
+  else if(f==='amount'){ item.amount=parseNum(e.target.value); }
+  else if(f==='vatNow'){ item.vatNow=parseFloat(e.target.value); }
+  else if(f==='vat2027'){ item.vat2027=parseFloat(e.target.value); }
+  // re-render only headline + the touched row's "new" cell to keep focus on inputs
+  if(f==='amount'||f==='name'){ updateRowNew(i); renderHeadline(); }
+  else { renderBasket(); renderHeadline(); }
+});
+document.getElementById('basketRows').addEventListener('click',e=>{
+  const del=e.target.closest('[data-del]'); if(!del) return;
+  state.basket.splice(+del.getAttribute('data-del'),1);
+  renderBasket(); renderHeadline();
+});
+function updateRowNew(i){
+  const b=computeBasket(); const ln=b.lines[i];
+  const rowEl=document.querySelector(`.basket-row[data-i="${i}"] .new`);
+  if(!rowEl||!ln) return;
+  const t=T();
+  const deltaCls=Math.abs(ln.totalDelta)<0.5?'flat':'';
+  const deltaTxt=Math.abs(ln.totalDelta)<0.5?'±0':(ln.totalDelta>0?'+':'−')+fmtMDL(Math.abs(ln.totalDelta))+' ('+(ln.totalDelta>0?'+':'−')+fmt(Math.abs(ln.pct*100),0)+'%)';
+  rowEl.innerHTML=`<span>${fmtMDL(ln.newTotal)}${ln.energy?` <span class="energy-tag">${t.energyTag}</span>`:''}</span><span class="delta ${deltaCls}">${deltaTxt}</span>`;
+}
+// add row
+document.getElementById('addRow').addEventListener('click',()=>{
+  state.basket.push({key:'new', name:T().cat_new, custom:true, amount:500, vatNow:0.20, vat2027:0.20, energy:false});
+  renderBasket(); renderHeadline();
+});
+
+/* =================================================================
+   INIT
+   ================================================================= */
+document.getElementById('cascadeChk').checked=state.cascadeOn;
+slider.value=(state.cascadeCoef*100).toString();
+document.getElementById('coefVal').textContent=(state.cascadeCoef*100).toFixed(1)+'%';
+applyI18n();
+</script>
+</body>
+</html>
